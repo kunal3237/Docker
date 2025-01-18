@@ -107,7 +107,113 @@ b0ede2a1a2bb   kindest/node:v1.28.0   "/usr/local/bin/entr…"   4 weeks ago   U
 80829f8b2dec   kindest/node:v1.28.0   "/usr/local/bin/entr…"   4 weeks ago   Up 30 minutes                               kind-worker
 
 
-#############################Status is exited as container run a process. And exist once the process is complete ################################
+#############################Status is exited as container is alive till process runs. And exist once the process is complete ################################
 root@kunal-Lenovo-U410:/home/kunal/Docker-Study/First# docker ps -a | grep -i myfirstdocker
 e1173b9285b4   hello-world                                             "/hello"                 About a minute ago   Exited (0) About a minute ago                               myfirstdocker
 root@kunal-Lenovo-U410:/home/kunal/Docker-Study/First# 
+
+
+###############################################################################################
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/First# docker logs e1173b9285b4
+
+Hello from Docker!
+This message shows that your installation appears to be working correctly.
+
+To generate this message, Docker took the following steps:
+ 1. The Docker client contacted the Docker daemon.
+ 2. The Docker daemon pulled the "hello-world" image from the Docker Hub.
+    (amd64)
+ 3. The Docker daemon created a new container from that image which runs the
+    executable that produces the output you are currently reading.
+ 4. The Docker daemon streamed that output to the Docker client, which sent it
+    to your terminal.
+
+To try something more ambitious, you can run an Ubuntu container with:
+ $ docker run -it ubuntu bash
+
+Share images, automate workflows, and more with a free Docker ID:
+ https://hub.docker.com/
+
+For more examples and ideas, visit:
+ https://docs.docker.com/get-started/
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/First# 
+
+
+###############################################################################
+
+Running the container in detached mode with port published 8090
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/First# docker run -d -p 8090:80 --name mynginx stacksimplify/mynginx:v1
+799b59e52557b55d905c81fb8fd7a2284c8ca8e7e7f9e0b74a96d50fc7bf30c7
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/First# docker ps
+CONTAINER ID   IMAGE                      COMMAND                  CREATED          STATUS          PORTS                                   NAMES
+799b59e52557   stacksimplify/mynginx:v1   "/docker-entrypoint.…"   10 seconds ago   Up 6 seconds    0.0.0.0:8090->80/tcp, :::8090->80/tcp   mynginx
+0fc484d9bd09   kindest/node:v1.28.0       "/usr/local/bin/entr…"   4 weeks ago      Up 47 minutes                                           kind-worker3
+14d475883ba7   kindest/node:v1.28.0       "/usr/local/bin/entr…"   4 weeks ago      Up 47 minutes                                           kind-worker2
+b0ede2a1a2bb   kindest/node:v1.28.0       "/usr/local/bin/entr…"   4 weeks ago      Up 47 minutes   127.0.0.1:36811->6443/tcp               kind-control-plane
+80829f8b2dec   kindest/node:v1.28.0       "/usr/local/bin/entr…"   4 weeks ago      Up 47 minutes                                           kind-worker
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/First# 
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/First# docker ps -f name=mynginx
+CONTAINER ID   IMAGE                      COMMAND                  CREATED         STATUS         PORTS                                   NAMES
+799b59e52557   stacksimplify/mynginx:v1   "/docker-entrypoint.…"   3 minutes ago   Up 3 minutes   0.0.0.0:8090->80/tcp, :::8090->80/tcp   mynginx
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/First# 
+
+##################################Connecting to docker terminal ##############################
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/First# docker ps -f name=mynginx
+CONTAINER ID   IMAGE                      COMMAND                  CREATED         STATUS         PORTS                                   NAMES
+799b59e52557   stacksimplify/mynginx:v1   "/docker-entrypoint.…"   5 minutes ago   Up 5 minutes   0.0.0.0:8090->80/tcp, :::8090->80/tcp   mynginx
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/First# docker exec -it 799b59e52557 bash
+root@799b59e52557:/# hostname
+799b59e52557
+root@799b59e52557:/# 
+
+
+#########################Direct command on container #############################
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/First# docker exec -it 799b59e52557 ls
+bin   docker-entrypoint.d   home   media  proc	sbin  tmp
+boot  docker-entrypoint.sh  lib    mnt	  root	srv   usr
+dev   etc		    lib64  opt	  run	sys   var
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/First# 
+
+
+####################################Stopping and starting the containers###########################################
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/First# docker stop 799b59e52557
+799b59e52557
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/First# docker ps -a | grep -i mynginx
+799b59e52557   stacksimplify/mynginx:v1                                "/docker-entrypoint.…"   11 minutes ago      Exited (0) 2 minutes ago                                     mynginx
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/First# docker start mynginx
+mynginx
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/First# docker ps
+CONTAINER ID   IMAGE                      COMMAND                  CREATED          STATUS          PORTS                                   NAMES
+799b59e52557   stacksimplify/mynginx:v1   "/docker-entrypoint.…"   11 minutes ago   Up 3 seconds    0.0.0.0:8090->80/tcp, :::8090->80/tcp   mynginx
+0fc484d9bd09   kindest/node:v1.28.0       "/usr/local/bin/entr…"   4 weeks ago      Up 58 minutes                                           kind-worker3
+14d475883ba7   kindest/node:v1.28.0       "/usr/local/bin/entr…"   4 weeks ago      Up 59 minutes                                           kind-worker2
+b0ede2a1a2bb   kindest/node:v1.28.0       "/usr/local/bin/entr…"   4 weeks ago      Up 59 minutes   127.0.0.1:36811->6443/tcp               kind-control-plane
+80829f8b2dec   kindest/node:v1.28.0       "/usr/local/bin/entr…"   4 weeks ago      Up 59 minutes                                           kind-worker
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/First# 
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/First# docker stop mynginx
+mynginx
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/First# docker ps
+CONTAINER ID   IMAGE                  COMMAND                  CREATED       STATUS          PORTS                       NAMES
+0fc484d9bd09   kindest/node:v1.28.0   "/usr/local/bin/entr…"   4 weeks ago   Up 59 minutes                               kind-worker3
+14d475883ba7   kindest/node:v1.28.0   "/usr/local/bin/entr…"   4 weeks ago   Up 59 minutes                               kind-worker2
+b0ede2a1a2bb   kindest/node:v1.28.0   "/usr/local/bin/entr…"   4 weeks ago   Up 59 minutes   127.0.0.1:36811->6443/tcp   kind-control-plane
+80829f8b2dec   kindest/node:v1.28.0   "/usr/local/bin/entr…"   4 weeks ago   Up 59 minutes                               kind-worker
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/First# docker ps -a -f name=mynginx
+CONTAINER ID   IMAGE                      COMMAND                  CREATED          STATUS                      PORTS     NAMES
+799b59e52557   stacksimplify/mynginx:v1   "/docker-entrypoint.…"   12 minutes ago   Exited (0) 16 seconds ago             mynginx
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/First# 
+
+Removing container ####################################
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/First# docker rm mynginx
+mynginx
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/First# docker ps -a -f name=mynginx
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/First# 
+
