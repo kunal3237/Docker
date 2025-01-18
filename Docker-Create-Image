@@ -1,0 +1,81 @@
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/First# docker version
+Client: Docker Engine - Community
+ Version:           20.10.20
+ API version:       1.41
+ Go version:        go1.18.7
+ Git commit:        9fdeb9c
+ Built:             Tue Oct 18 18:20:18 2022
+ OS/Arch:           linux/amd64
+ Context:           default
+ Experimental:      true
+
+Server: Docker Engine - Community
+ Engine:
+  Version:          20.10.20
+  API version:      1.41 (minimum version 1.12)
+  Go version:       go1.18.7
+  Git commit:       03df974
+  Built:            Tue Oct 18 18:18:08 2022
+  OS/Arch:          linux/amd64
+  Experimental:     false
+ containerd:
+  Version:          1.6.8
+  GitCommit:        9cd3357b7fd7218e4aec3eae239db1f68a5a6ec6
+ runc:
+  Version:          1.1.4
+  GitCommit:        v1.1.4-0-g5fd4c4d
+ docker-init:
+  Version:          0.19.0
+  GitCommit:        de40ad0
+
+#######################Login in Docker Hub #############################
+
+Create PAT in your account to provide it as a password with your username
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/First# docker login
+Login with your Docker ID to push and pull images from Docker Hub. If you don't have a Docker ID, head over to https://hub.docker.com to create one.
+Username: kunal3237
+Password: 
+WARNING! Your password will be stored unencrypted in /root/.docker/config.json.
+Configure a credential helper to remove this warning. See
+https://docs.docker.com/engine/reference/commandline/login/#credentials-store
+
+Login Succeeded
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/First# 
+
+#########################################################################
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/First# docker run -d --name myapp1 -p 8091:80 nginx 
+Unable to find image 'nginx:latest' locally
+latest: Pulling from library/nginx
+af302e5c37e9: Pull complete 
+207b812743af: Pull complete 
+841e383b441e: Pull complete 
+0256c04a8d84: Pull complete 
+38e992d287c5: Pull complete 
+9e9aab598f58: Pull complete 
+4de87b37f4ad: Pull complete 
+Digest: sha256:0a399eb16751829e1af26fea27b20c3ec28d7ab1fb72182879dcae1cca21206a
+Status: Downloaded newer image for nginx:latest
+12db8a23a784ae1579245e367eab37c9cc7c33f504c09eac5b1cfa3ad91f8934
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/First# docker ps
+CONTAINER ID   IMAGE                  COMMAND                  CREATED          STATUS             PORTS                                   NAMES
+12db8a23a784   nginx                  "/docker-entrypoint.…"   27 seconds ago   Up 11 seconds      0.0.0.0:8091->80/tcp, :::8091->80/tcp   myapp1
+0fc484d9bd09   kindest/node:v1.28.0   "/usr/local/bin/entr…"   4 weeks ago      Up About an hour                                           kind-worker3
+14d475883ba7   kindest/node:v1.28.0   "/usr/local/bin/entr…"   4 weeks ago      Up About an hour                                           kind-worker2
+b0ede2a1a2bb   kindest/node:v1.28.0   "/usr/local/bin/entr…"   4 weeks ago      Up About an hour   127.0.0.1:36811->6443/tcp               kind-control-plane
+80829f8b2dec   kindest/node:v1.28.0   "/usr/local/bin/entr…"   4 weeks ago      Up About an hour                                           kind-worker
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/First# 
+
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/First# docker stop myapp1
+myapp1
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/First# docker ps -a -f name=myapp1
+CONTAINER ID   IMAGE     COMMAND                  CREATED              STATUS                      PORTS     NAMES
+12db8a23a784   nginx     "/docker-entrypoint.…"   About a minute ago   Exited (0) 14 seconds ago             myapp1
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/First# docker rm myapp1
+myapp1
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/First# docker ps -a -f name=myapp1
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/First# 
+
+#######################################################Creating Dockerfile#########################################
