@@ -1,0 +1,113 @@
+Available Docker Images on the system
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/First# docker images
+REPOSITORY                                        TAG              IMAGE ID       CREATED         SIZE
+myubuntu                                          latest           31f544b65ac1   3 hours ago     124MB
+<none>                                            <none>           1f90a62037d7   3 hours ago     124MB
+<none>                                            <none>           8f9dea7c0ac5   3 hours ago     124MB
+<none>                                            <none>           7fe66336806c   3 hours ago     123MB
+kunal3237/my-docker-practice/firstdockerprogram   1.0.3            724827a7e3da   3 hours ago     56MB
+kunal3237/my-docker-practice                      1.0.0            724827a7e3da   3 hours ago     56MB
+<none>                                            <none>           814ca6c49a67   3 hours ago     56MB
+<none>                                            <none>           50f76eaa63f3   3 hours ago     56MB
+kunal3237/my-docker-practice/firstdockerprogram   1.0.2            efad0e208c02   3 hours ago     56MB
+kunal3237/my-docker-practice/firstdockerprogram   1.0.1            0f18d5641b0c   4 hours ago     45.5MB
+kunal3237/my-docker-practice/firstdockerprogram   1.0.0            2de1c4f54d47   5 hours ago     45.5MB
+python                                            3.14-rc-alpine   aa236fd83469   3 days ago      45.5MB
+ubuntu                                            latest           b1d9df8ab815   8 weeks ago     78.1MB
+kindest/node                                      v1.28.0          ad70201dab13   17 months ago   950MB
+oracle/database                                   19.3.0-ee        0291ee4fa2ff   2 years ago     6.54GB
+oraclelinux                                       7-slim           b6816fd9cf33   2 years ago     135MB
+hello-world                                       latest           feb5d9fea6a5   3 years ago     13.3kB
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/First# 
+#########################Pulling an image from puplic repository#################
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/First# docker pull stacksimplify/mynginx:v1
+v1: Pulling from stacksimplify/mynginx
+a2318d6c47ec: Pull complete 
+095d327c79ae: Pull complete 
+bbfaa25db775: Pull complete 
+7bb6fb0cfb2b: Pull complete 
+0723edc10c17: Pull complete 
+24b3fdc4d1e3: Pull complete 
+3122471704d5: Pull complete 
+8edfe8d13ab4: Pull complete 
+Digest: sha256:7024efc5adcc73df0abeab16d0f613e84bcafe695930c12816972f37e3b0f259
+Status: Downloaded newer image for stacksimplify/mynginx:v1
+docker.io/stacksimplify/mynginx:v1
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/First# docker images
+REPOSITORY                                        TAG              IMAGE ID       CREATED         SIZE
+myubuntu                                          latest           31f544b65ac1   3 hours ago     124MB
+<none>                                            <none>           1f90a62037d7   3 hours ago     124MB
+<none>                                            <none>           8f9dea7c0ac5   3 hours ago     124MB
+<none>                                            <none>           7fe66336806c   3 hours ago     123MB
+kunal3237/my-docker-practice/firstdockerprogram   1.0.3            724827a7e3da   3 hours ago     56MB
+kunal3237/my-docker-practice                      1.0.0            724827a7e3da   3 hours ago     56MB
+<none>                                            <none>           814ca6c49a67   3 hours ago     56MB
+<none>                                            <none>           50f76eaa63f3   3 hours ago     56MB
+kunal3237/my-docker-practice/firstdockerprogram   1.0.2            efad0e208c02   4 hours ago     56MB
+kunal3237/my-docker-practice/firstdockerprogram   1.0.1            0f18d5641b0c   5 hours ago     45.5MB
+kunal3237/my-docker-practice/firstdockerprogram   1.0.0            2de1c4f54d47   5 hours ago     45.5MB
+python                                            3.14-rc-alpine   aa236fd83469   3 days ago      45.5MB
+ubuntu                                            latest           b1d9df8ab815   8 weeks ago     78.1MB
+stacksimplify/mynginx                             v1               808338d34e40   4 months ago    188MB                                      ####Image pulled from public repository
+kindest/node                                      v1.28.0          ad70201dab13   17 months ago   950MB
+oracle/database                                   19.3.0-ee        0291ee4fa2ff   2 years ago     6.54GB
+oraclelinux                                       7-slim           b6816fd9cf33   2 years ago     135MB
+hello-world                                       latest           feb5d9fea6a5   3 years ago     13.3kB
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/First# 
+
+
+#########################Pulled and removed some of the images#########################################
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/First# docker pull ghcr.io/stacksimplify/mynginx:v1                                            #####Pulling the image from githun repoistory
+v1: Pulling from stacksimplify/mynginx
+302e3ee49805: Pull complete 
+d07412f52e9d: Pull complete 
+9ab66c386e9c: Pull complete 
+4b563e5e980a: Pull complete 
+55af3c8febf2: Pull complete 
+5b8e768fb22d: Pull complete 
+85177e2c6f39: Pull complete 
+d1f59575a1a4: Pull complete 
+Digest: sha256:85061783489ab12d27ca84c343cb06a01267f592285ab89025a324b38df6073b
+Status: Downloaded newer image for ghcr.io/stacksimplify/mynginx:v1                                              
+ghcr.io/stacksimplify/mynginx:v1
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/First# docker images
+REPOSITORY                                        TAG              IMAGE ID       CREATED         SIZE
+myubuntu                                          latest           31f544b65ac1   3 hours ago     124MB
+kunal3237/my-docker-practice                      1.0.0            724827a7e3da   3 hours ago     56MB
+kunal3237/my-docker-practice/firstdockerprogram   1.0.3            724827a7e3da   3 hours ago     56MB
+kunal3237/my-docker-practice/firstdockerprogram   1.0.2            efad0e208c02   4 hours ago     56MB
+kunal3237/my-docker-practice/firstdockerprogram   1.0.1            0f18d5641b0c   5 hours ago     45.5MB
+kunal3237/my-docker-practice/firstdockerprogram   1.0.0            2de1c4f54d47   5 hours ago     45.5MB
+python                                            3.14-rc-alpine   aa236fd83469   3 days ago      45.5MB
+ubuntu                                            latest           b1d9df8ab815   8 weeks ago     78.1MB
+ghcr.io/stacksimplify/mynginx                     v1               2a6b6d4c59d5   3 months ago    192MB
+stacksimplify/mynginx                             v1               808338d34e40   4 months ago    188MB
+kindest/node                                      v1.28.0          ad70201dab13   17 months ago   950MB
+oracle/database                                   19.3.0-ee        0291ee4fa2ff   2 years ago     6.54GB
+oraclelinux                                       7-slim           b6816fd9cf33   2 years ago     135MB
+hello-world                                       latest           feb5d9fea6a5   3 years ago     13.3kB
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/First# 
+#############################Creating container from hello world image ###############################
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/First# docker run -d --name myfirstdocker hello-world
+Unable to find image 'hello-world:latest' locally
+latest: Pulling from library/hello-world
+c1ec31eb5944: Pull complete 
+Digest: sha256:1b7a37f2a0e26e55ba2916e0c53bfbe60d9bd43e390e31aacd25cb3581ed74e6
+Status: Downloaded newer image for hello-world:latest
+e1173b9285b4cb4e26377c0a1631ddcafd0092050e0d9794a4f5694e9d013285
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/First# docker ps
+CONTAINER ID   IMAGE                  COMMAND                  CREATED       STATUS          PORTS                       NAMES
+0fc484d9bd09   kindest/node:v1.28.0   "/usr/local/bin/entr…"   4 weeks ago   Up 30 minutes                               kind-worker3
+14d475883ba7   kindest/node:v1.28.0   "/usr/local/bin/entr…"   4 weeks ago   Up 30 minutes                               kind-worker2
+b0ede2a1a2bb   kindest/node:v1.28.0   "/usr/local/bin/entr…"   4 weeks ago   Up 30 minutes   127.0.0.1:36811->6443/tcp   kind-control-plane
+80829f8b2dec   kindest/node:v1.28.0   "/usr/local/bin/entr…"   4 weeks ago   Up 30 minutes                               kind-worker
+
+
+#############################Status is exited as container run a process. And exist once the process is complete ################################
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/First# docker ps -a | grep -i myfirstdocker
+e1173b9285b4   hello-world                                             "/hello"                 About a minute ago   Exited (0) About a minute ago                               myfirstdocker
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/First# 
