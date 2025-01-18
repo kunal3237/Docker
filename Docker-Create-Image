@@ -79,3 +79,114 @@ CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
 root@kunal-Lenovo-U410:/home/kunal/Docker-Study/First# 
 
 #######################################################Creating Dockerfile#########################################
+
+Dockerfile is a blueprint to create an image . It contains docker commands. Commands can be wriiten in lowercase but as per standard, commands are written in uppercase
+to distnguish it from other commands and arguments
+
+##########################################Image created with lowercase #######################
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker build -t myapp1 .
+Sending build context to Docker daemon  4.608kB
+Step 1/2 : from nginx
+ ---> 9bea9f2796e2
+Step 2/2 : copy index.html /usr/share/nginx/html
+ ---> e56107c3d22b
+Successfully built e56107c3d22b
+Successfully tagged myapp1:latest
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# cat Dockerfile
+from nginx
+
+copy index.html /usr/share/nginx/html
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+###################################Image created with upppercase##########################
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker build -t myapp2 .
+Sending build context to Docker daemon  4.608kB
+Step 1/2 : FROM nginx
+ ---> 9bea9f2796e2
+Step 2/2 : COPY index.html /usr/share/nginx/index.html
+ ---> 85f133bf8508
+Successfully built 85f133bf8508
+Successfully tagged myapp2:latest
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# cat Dockerfile
+FROM nginx
+
+COPY index.html /usr/share/nginx/index.html
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker images  | grep -i myapp*
+myapp2                                            latest           85f133bf8508   About a minute ago   192MB
+myapp1                                            latest           e56107c3d22b   2 minutes ago        192MB
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker run -d --name lowercase -p 8094:80 myapp1 
+184b1fcdce2f8c3d1fc1d76c913878c10ead5d7fcdf080822ea08c2b98770ba2
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker run -d --name uppercase -p 8095:80 myapp2
+91b8499803b3a4813590ea7cf8f78178ae2ddb26270c6223f9f1a0ba3df937ce
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker ps 
+CONTAINER ID   IMAGE                  COMMAND                  CREATED          STATUS          PORTS                                   NAMES
+91b8499803b3   myapp2                 "/docker-entrypoint.…"   10 seconds ago   Up 5 seconds    0.0.0.0:8095->80/tcp, :::8095->80/tcp   uppercase
+184b1fcdce2f   myapp1                 "/docker-entrypoint.…"   35 seconds ago   Up 30 seconds   0.0.0.0:8094->80/tcp, :::8094->80/tcp   lowercase
+0fc484d9bd09   kindest/node:v1.28.0   "/usr/local/bin/entr…"   4 weeks ago      Up 2 hours                                              kind-worker3
+14d475883ba7   kindest/node:v1.28.0   "/usr/local/bin/entr…"   4 weeks ago      Up 2 hours                                              kind-worker2
+b0ede2a1a2bb   kindest/node:v1.28.0   "/usr/local/bin/entr…"   4 weeks ago      Up 2 hours      127.0.0.1:36811->6443/tcp               kind-control-plane
+80829f8b2dec   kindest/node:v1.28.0   "/usr/local/bin/entr…"   4 weeks ago      Up 2 hours                                              kind-worker
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+####################################Accessing both containers ###########################################
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# curl http://localhost:8094
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StackSimplify</title>
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      text-align: center; 
+      padding: 50px; 
+      background-color: rgb(197, 144, 144);
+    }
+    h1 { font-size: 50px; }
+    h2 { font-size: 40px; }
+    h3 { font-size: 30px; }
+    p { font-size: 20px; }
+  </style>
+</head>
+<body>
+  <h1>Welcome to Learn Docker</h1>
+  <h2>Docker Image BUILD, RUN, TAG and PUSH to Docker Hub</h2>
+  <p>Learn technology through practical, real-world demos.</p>
+  <p>Application Version: v1</p>
+</body>
+</html>
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# curl http://localhost:8095
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+html { color-scheme: light dark; }
+body { width: 35em; margin: 0 auto;
+font-family: Tahoma, Verdana, Arial, sans-serif; }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+#################################################################################
+
