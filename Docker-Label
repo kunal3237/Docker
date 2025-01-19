@@ -1,0 +1,167 @@
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker images
+REPOSITORY                      TAG              IMAGE ID       CREATED         SIZE
+myubuntu                        latest           31f544b65ac1   28 hours ago    124MB
+python                          3.14-rc-alpine   aa236fd83469   4 days ago      45.5MB
+nginx                           latest           9bea9f2796e2   7 weeks ago     192MB
+ubuntu                          latest           b1d9df8ab815   2 months ago    78.1MB
+ghcr.io/stacksimplify/mynginx   v1               2a6b6d4c59d5   3 months ago    192MB
+stacksimplify/mynginx           v1               808338d34e40   4 months ago    188MB
+kindest/node                    v1.28.0          ad70201dab13   17 months ago   950MB
+hello-world                     latest           d2c94e258dcb   20 months ago   13.3kB
+oracle/database                 19.3.0-ee        0291ee4fa2ff   2 years ago     6.54GB
+oraclelinux                     7-slim           b6816fd9cf33   2 years ago     135MB
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# cat Dockerfile
+FROM nginx
+
+LABEL Author: Kunal Sharma
+COPY index.html /usr/share/nginx/index.html
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker build -t myapp1 .                                                             # "." is build context here. Dockerfile/other files exist in the directory
+Sending build context to Docker daemon  4.608kB
+Step 1/3 : FROM nginx
+ ---> 9bea9f2796e2
+Step 2/3 : LABEL Author: Kunal Sharma
+ ---> Running in 09f0e4909aee
+Removing intermediate container 09f0e4909aee
+ ---> 67df1ec09b74
+Step 3/3 : COPY index.html /usr/share/nginx/index.html
+ ---> cbb92599238d
+Successfully built cbb92599238d
+Successfully tagged myapp1:latest
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# Docker-Label
+
+
+######################################Build an tagging #####################################################
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker images
+REPOSITORY                      TAG              IMAGE ID       CREATED              SIZE
+myapp1                          latest           cbb92599238d   About a minute ago   192MB
+myubuntu                        latest           31f544b65ac1   28 hours ago         124MB
+python                          3.14-rc-alpine   aa236fd83469   4 days ago           45.5MB
+nginx                           latest           9bea9f2796e2   7 weeks ago          192MB
+ubuntu                          latest           b1d9df8ab815   2 months ago         78.1MB
+ghcr.io/stacksimplify/mynginx   v1               2a6b6d4c59d5   3 months ago         192MB
+stacksimplify/mynginx           v1               808338d34e40   4 months ago         188MB
+kindest/node                    v1.28.0          ad70201dab13   17 months ago        950MB
+hello-world                     latest           d2c94e258dcb   20 months ago        13.3kB
+oracle/database                 19.3.0-ee        0291ee4fa2ff   2 years ago          6.54GB
+oraclelinux                     7-slim           b6816fd9cf33   2 years ago          135MB
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker tag myapp1 kunal3237/myapp:1.0.0
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker images
+REPOSITORY                      TAG              IMAGE ID       CREATED              SIZE
+kunal3237/myapp                 1.0.0            cbb92599238d   About a minute ago   192MB
+myapp1                          latest           cbb92599238d   About a minute ago   192MB
+myubuntu                        latest           31f544b65ac1   28 hours ago         124MB
+python                          3.14-rc-alpine   aa236fd83469   4 days ago           45.5MB
+nginx                           latest           9bea9f2796e2   7 weeks ago          192MB
+ubuntu                          latest           b1d9df8ab815   2 months ago         78.1MB
+ghcr.io/stacksimplify/mynginx   v1               2a6b6d4c59d5   3 months ago         192MB
+stacksimplify/mynginx           v1               808338d34e40   4 months ago         188MB
+kindest/node                    v1.28.0          ad70201dab13   17 months ago        950MB
+hello-world                     latest           d2c94e258dcb   20 months ago        13.3kB
+oracle/database                 19.3.0-ee        0291ee4fa2ff   2 years ago          6.54GB
+oraclelinux                     7-slim           b6816fd9cf33   2 years ago          135MB
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+###################################################################################################
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker push kunal3237/myapp:1.0.0
+The push refers to repository [docker.io/kunal3237/myapp]
+c1534abc00a5: Pushed 
+b57b5eac2941: Pushed 
+58045dd06e5b: Pushed 
+541cf9cf006d: Pushed 
+32c977818204: Pushed 
+943132143199: Pushed 
+88ebb510d2fb: Mounted from library/nginx 
+f5fe472da253: Mounted from library/nginx 
+1.0.0: digest: sha256:acd2006f7b48f691f91d5b0e6bfb4bb0925bb67d231043c1c26f7db411918b2d size: 1986
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+###################################Docker Search images on docker hub #######################################
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker search --filter is-official=true myapp
+NAME      DESCRIPTION   STARS     OFFICIAL   AUTOMATED
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker search myapp --limit 5
+NAME                   DESCRIPTION   STARS     OFFICIAL   AUTOMATED
+suhasdpatil/myapp                    0                    
+nilabjah/myapp                       0                    
+vinayakkarigar/myapp                 0                    
+migggykun/myapp                      0                    
+glenndsouza/myapp                    0                    
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+
+##############################Creating images with Labels #################################
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# cat Dockerfile
+FROM nginx:alpine-slim
+
+# Custom Labels
+
+LABEL Author: Kunal Sharma                                                                          Label are key value pair , we can use = as well to define the key value pair
+LABEL Version: 1.0.0
+LABEL Description : "Creating images with lables"
+
+#OCI Labels
+
+LABEL org.opencontainers.image.authors : Kunal Sharma
+LABEL org.opencontainers.image.created : Jan 19 2025
+
+
+#Copying the files from source to dest
+
+COPY index.html /usr/share/index.html
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker build -t kunal3237/imagewithlabel:1.0.0 .
+Sending build context to Docker daemon  4.608kB
+Step 1/7 : FROM nginx:alpine-slim
+alpine-slim: Pulling from library/nginx
+66a3d608f3fa: Pull complete 
+58290db888fa: Pull complete 
+5d777e0071f6: Pull complete 
+dbcfe8732ee6: Pull complete 
+37d775ecfbb9: Pull complete 
+e0350d1fd4dd: Pull complete 
+1f4aa363b71a: Pull complete 
+Digest: sha256:5a56ae385906c5b43ccc99379bce883aa93dc0556d7f705ba501d819925e8fa1
+Status: Downloaded newer image for nginx:alpine-slim
+ ---> 9765c8de364c
+Step 2/7 : LABEL Author: Kunal Sharma
+ ---> Running in c3d28e7b9f96
+Removing intermediate container c3d28e7b9f96
+ ---> cd5aefd88b22
+Step 3/7 : LABEL Version: 1.0.0
+ ---> Running in 3193f39f5553
+Removing intermediate container 3193f39f5553
+ ---> f8d063710d40
+Step 4/7 : LABEL Description : "Creating images with lables"
+ ---> Running in c539579407d8
+Removing intermediate container c539579407d8
+ ---> 1314c9a61913
+Step 5/7 : LABEL org.opencontainers.image.authors : Kunal Sharma
+ ---> Running in c82102ec0053
+Removing intermediate container c82102ec0053
+ ---> d97515fd3124
+Step 6/7 : LABEL org.opencontainers.image.created : Jan 19 2025
+ ---> Running in 61035d3d1887
+Removing intermediate container 61035d3d1887
+ ---> d6359cf882ef
+Step 7/7 : COPY index.html /usr/share/index.html
+ ---> bfd858cb82a9
+Successfully built bfd858cb82a9
+Successfully tagged kunal3237/imagewithlabel:1.0.0
+
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker images
+REPOSITORY                      TAG              IMAGE ID       CREATED              SIZE
+kunal3237/imagewithlabel        1.0.0            bfd858cb82a9   About a minute ago   11.8MB
+myubuntu                        latest           31f544b65ac1   28 hours ago         124MB
+python                          3.14-rc-alpine   aa236fd83469   4 days ago           45.5MB
+nginx                           alpine-slim      9765c8de364c   7 weeks ago          11.8MB
+nginx                           latest           9bea9f2796e2   7 weeks ago          192MB
+ubuntu                          latest           b1d9df8ab815   2 months ago         78.1MB
+ghcr.io/stacksimplify/mynginx   v1               2a6b6d4c59d5   3 months ago         192MB
+stacksimplify/mynginx           v1               808338d34e40   4 months ago         188MB
+kindest/node                    v1.28.0          ad70201dab13   17 months ago        950MB
+hello-world                     latest           d2c94e258dcb   20 months ago        13.3kB
+oracle/database                 19.3.0-ee        0291ee4fa2ff   2 years ago          6.54GB
+oraclelinux                     7-slim           b6816fd9cf33   2 years ago          135MB
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
