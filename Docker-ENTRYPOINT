@@ -1,0 +1,74 @@
+################Use ENTRYPOINT when you want to define a container with a specific executable.
+Use CMD to provide default arguments to the ENTRYPOINT.
+
+
+########################Using ENTRYPOINT######################
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# cat Dockerfile
+FROM ubuntu
+
+LABEL Author: Kunal Sharma
+
+ENTRYPOINT ["echo" ,"kunal"]
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker build -t kunal3237/imagewithentrypoint .; docker run --name  myapp -p 8081:80 -d kunal3237/imagewithentrypoint;docker ps;docker exec -it myapp bash
+Sending build context to Docker daemon  17.41kB
+Step 1/3 : FROM ubuntu
+ ---> b1d9df8ab815
+Step 2/3 : LABEL Author: Kunal Sharma
+ ---> Running in dbc1674d3e1b
+Removing intermediate container dbc1674d3e1b
+ ---> 852a6166de0b
+Step 3/3 : ENTRYPOINT ["echo" ,"kunal"]
+ ---> Running in a6133a42552e
+Removing intermediate container a6133a42552e
+ ---> 1952ca90cfbb
+Successfully built 1952ca90cfbb
+Successfully tagged kunal3237/imagewithentrypoint:latest
+2f3d50e5f00836dc94f80b772ae361842bd6909c0e46ea1ae161d732aff59d38
+CONTAINER ID   IMAGE                           COMMAND                  CREATED         STATUS                  PORTS                                   NAMES
+2f3d50e5f008   kunal3237/imagewithentrypoint   "echo kunal"             3 seconds ago   Up Less than a second   0.0.0.0:8081->80/tcp, :::8081->80/tcp   myapp
+0fc484d9bd09   kindest/node:v1.28.0            "/usr/local/bin/entr…"   5 weeks ago     Up 9 hours                                                      kind-worker3
+14d475883ba7   kindest/node:v1.28.0            "/usr/local/bin/entr…"   5 weeks ago     Up 9 hours                                                      kind-worker2
+b0ede2a1a2bb   kindest/node:v1.28.0            "/usr/local/bin/entr…"   5 weeks ago     Up 9 hours              127.0.0.1:36811->6443/tcp               kind-control-plane
+80829f8b2dec   kindest/node:v1.28.0            "/usr/local/bin/entr…"   5 weeks ago     Up 9 hours                                                      kind-worker
+OCI runtime exec failed: exec failed: cannot exec in a stopped container: unknown
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker logs myapp
+kunal
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+
+##########################Appending ARguments to ENTRYPOINT #####################
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker build -t kunal3237/imagewithentrypoint .
+Sending build context to Docker daemon  17.41kB
+Step 1/3 : FROM ubuntu
+ ---> b1d9df8ab815
+Step 2/3 : LABEL Author: Kunal Sharma
+ ---> Running in 9a0d14c4cb7b
+Removing intermediate container 9a0d14c4cb7b
+ ---> df1b3077031a
+Step 3/3 : ENTRYPOINT ["echo" ,"kunal"]
+ ---> Running in e99fd2a866bf
+Removing intermediate container e99fd2a866bf
+ ---> 45831da42328
+Successfully built 45831da42328
+Successfully tagged kunal3237/imagewithentrypoint:latest
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker run --name myapp kunal3237/imagewithentrypoint /bin/sh                            #####/bin/sh is added as an argument
+kunal /bin/sh                                                                                          #####Output is /bin/sh appended
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker logs myapp
+kunal /bin/sh
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+################################################Overriding Entrypoint ##########################
+
+Please take care of using the option in proper order else you find issue  ########################################
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker run --name  myapp --entrypoint /bin/sh  kunal3237/imagewithentrypoint -c 'echo "hello There"'
+hello There
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+See Below if wrong order is passed, command will throw an error ###########################################################Commadn Argument should be passed at end
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker run --name  myapp --entrypoint /bin/sh  -c 'echo "Hello there"' kunal3237/imagewithentrypoint
+invalid argument "echo \"Hello there\"" for "-c, --cpu-shares" flag: strconv.ParseInt: parsing "echo \"Hello there\"": invalid syntax
+See 'docker run --help'.
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
