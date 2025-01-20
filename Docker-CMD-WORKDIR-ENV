@@ -2,3 +2,471 @@
 \###ARG is build Time Variable
 ####ENV is runtime variables
 
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker build -t kunal3237/imagewithrunandexpose .
+Sending build context to Docker daemon  14.34kB
+Step 1/7 : ARG NGINX_VERSION=1.26
+Step 2/7 : FROM nginx:${NGINX_VERSION}-alpine-slim
+ ---> 008f853bbf53
+Step 3/7 : ENV myvar=$NGINX_VERSION                                          ######Will be available in Container
+ ---> Running in aae98e953aff
+Removing intermediate container aae98e953aff
+ ---> cd4dc04ee14c
+Step 4/7 : RUN echo "$NGINX_VERSION"                                              #####ARG
+ ---> Running in ee4e1696e7c3
+1.26.2
+Removing intermediate container ee4e1696e7c3
+ ---> 022437fb7bfe
+Step 5/7 : RUN apk add bash curl
+ ---> Running in a8da00c2e450
+fetch https://dl-cdn.alpinelinux.org/alpine/v3.20/main/x86_64/APKINDEX.tar.gz
+fetch https://dl-cdn.alpinelinux.org/alpine/v3.20/community/x86_64/APKINDEX.tar.gz
+(1/14) Installing ncurses-terminfo-base (6.4_p20240420-r2)
+(2/14) Installing libncursesw (6.4_p20240420-r2)
+(3/14) Installing readline (8.2.10-r0)
+(4/14) Installing bash (5.2.26-r0)
+Executing bash-5.2.26-r0.post-install
+(5/14) Installing ca-certificates (20241121-r1)
+(6/14) Installing brotli-libs (1.1.0-r2)
+(7/14) Installing c-ares (1.33.1-r0)
+(8/14) Installing libunistring (1.2-r0)
+(9/14) Installing libidn2 (2.3.7-r0)
+(10/14) Installing nghttp2-libs (1.62.1-r0)
+(11/14) Installing libpsl (0.21.5-r1)
+(12/14) Installing zstd-libs (1.5.6-r0)
+(13/14) Installing libcurl (8.11.1-r0)
+(14/14) Installing curl (8.11.1-r0)
+Executing busybox-1.36.1-r29.trigger
+Executing ca-certificates-20241121-r1.trigger
+OK: 20 MiB in 32 packages
+Removing intermediate container a8da00c2e450
+ ---> d60a03f1e3fd
+Step 6/7 : COPY nginx.conf /etc/nginx/nginx.conf
+ ---> 845df4e60274
+Step 7/7 : EXPOSE 8090
+ ---> Running in e5fc62a38e05
+Removing intermediate container e5fc62a38e05
+ ---> e0a490588479
+Successfully built e0a490588479
+Successfully tagged kunal3237/imagewithrunandexpose:latest
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# cat Dockerfile
+ARG NGINX_VERSION=1.26                                                      ################ARG Defined
+
+FROM nginx:${NGINX_VERSION}-alpine-slim
+ENV myvar=$NGINX_VERSION                                                    ######Environment
+RUN echo "$NGINX_VERSION" 
+RUN apk add bash curl
+COPY nginx.conf /etc/nginx/nginx.conf
+EXPOSE 8090
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+###############################################################################
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker run --name myapp -d -p 8081:8090 kunal3237/imagewithrunandexpose
+be9a820e88be8888ed48dd6492ed9717575921c62559cc888adfe6ef4d224dc1
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker ps
+CONTAINER ID   IMAGE                             COMMAND                  CREATED         STATUS         PORTS                                               NAMES
+be9a820e88be   kunal3237/imagewithrunandexpose   "/docker-entrypoint.…"   8 seconds ago   Up 3 seconds   80/tcp, 0.0.0.0:8081->8090/tcp, :::8081->8090/tcp   myapp
+0fc484d9bd09   kindest/node:v1.28.0              "/usr/local/bin/entr…"   5 weeks ago     Up 8 hours                                                         kind-worker3
+14d475883ba7   kindest/node:v1.28.0              "/usr/local/bin/entr…"   5 weeks ago     Up 8 hours                                                         kind-worker2
+b0ede2a1a2bb   kindest/node:v1.28.0              "/usr/local/bin/entr…"   5 weeks ago     Up 8 hours     127.0.0.1:36811->6443/tcp                           kind-control-plane
+80829f8b2dec   kindest/node:v1.28.0              "/usr/local/bin/entr…"   5 weeks ago     Up 8 hours                                                         kind-worker
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker exec -it be9a820e88be bash
+be9a820e88be:/# env | grep -i myvar
+myvar=1.26.2                                                              #############Env Variable value available
+be9a820e88be:/# env | grep -i nginx
+NGINX_VERSION=1.26.2
+be9a820e88be:/# 
+
+
+############################################################
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# cat Dockerfile
+
+ARG file_name="nginx.conf"                                    ####If using ARG here and calling the ARG later, It is copying all the files
+FROM nginx:1.26.2-alpine-slim
+#ARG file_name="nginx.conf"
+ENV myvar="Kunal"
+RUN apk add bash curl
+COPY ${file_name} /etc/nginx/${file_name}
+EXPOSE 8090
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker run --name myapp -d -p 8081:8090 kunal3237/imagewithrunandexpose
+4c6ad9418d9c2f7cb29f8cbacedb497ad459c71fc0d14dce9987f5360ebc2401
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker exec -it myapp bash
+4c6ad9418d9c:/# cd etc/nginx
+4c6ad9418d9c:/etc/nginx# ls                                                      ###############All file of the directory are copied
+Dockerfile       Dockerfile3      conf.d           fastcgi_params   index.tar.gz     index3.html      modules          requirement.txt  uwsgi_params
+Dockerfile2      Dockerfile5      fastcgi.conf     index.html       index2.html      mime.types       nginx.conf       scgi_params
+
+4c6ad9418d9c:/etc/nginx# exit
+exit
+
+
+#####################################################
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# cat Dockerfile
+
+#ARG file_name="nginx.conf"
+FROM nginx:1.26.2-alpine-slim
+ARG file_name="nginx.conf"                                        ####Defining ARG here
+ENV myvar="Kunal"
+RUN apk add bash curl
+COPY ${file_name} /etc/nginx/${file_name}
+EXPOSE 8090
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker run --name myapp -d -p 8081:8090 kunal3237/imagewithrunandexpose
+e76a93c826ea82882e904f1bcef1747ea72a5c45bd399d82e1039c9292721f8a
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker exec -it myapp bash
+e76a93c826ea:/# ls -ltr /etc/nginx                                    ####only nginx.conf file copied, So check where you use the ARG to avoid Surprises
+total 36
+-rw-r--r--    1 root     root           664 Aug 14 05:42 uwsgi_params
+-rw-r--r--    1 root     root           636 Aug 14 05:42 scgi_params
+-rw-r--r--    1 root     root          5349 Aug 14 05:42 mime.types
+-rw-r--r--    1 root     root          1007 Aug 14 05:42 fastcgi_params
+-rw-r--r--    1 root     root          1077 Aug 14 05:42 fastcgi.conf
+lrwxrwxrwx    1 root     root            22 Jan  8 17:58 modules -> /usr/lib/nginx/modules
+-rw-r--r--    1 root     root           740 Jan 20 10:38 nginx.conf
+drwxr-xr-x    1 root     root          4096 Jan 20 12:08 conf.d
+e76a93c826ea:/# 
+e76a93c826ea:/# env
+HOSTNAME=e76a93c826ea
+PWD=/
+PKG_RELEASE=1
+HOME=/root
+DYNPKG_RELEASE=2
+TERM=xterm
+myvar=Kunal                                                                  #####ENV is available 
+SHLVL=1
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+NGINX_VERSION=1.26.2
+_=/usr/bin/env
+e76a93c826ea:/# 
+
+e76a93c826ea:/# env
+HOSTNAME=e76a93c826ea
+PWD=/
+PKG_RELEASE=1
+HOME=/root
+DYNPKG_RELEASE=2
+TERM=xterm
+myvar=Kunal
+SHLVL=1
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+NGINX_VERSION=1.26.2
+_=/usr/bin/env
+e76a93c826ea:/# echo $myvar
+Kunal
+e76a93c826ea:/# echo $file_name
+
+e76a93c826ea:/# 
+
+
+
+##########################So above Test shows that ARG only available for Run time whereas ENV is available for ENV of the container
+
+
+
+########################Providing ENV on run time with command line argument using -e ###################
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker run --name myapp -d -p 8081:8090 -e myvar="sharma" kunal3237/imagewithrunandexpose
+0262332d846f997b70a7311602229c07dbcb9ef0496080d8ec8e137037af390c
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker exec -it myapp bash
+0262332d846f:/# env
+HOSTNAME=0262332d846f
+PWD=/
+PKG_RELEASE=1
+HOME=/root
+DYNPKG_RELEASE=2
+TERM=xterm
+myvar=sharma                                                          ######Now myvar is changed
+SHLVL=1
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+NGINX_VERSION=1.26.2
+_=/usr/bin/env
+0262332d846f:/# 
+
+#####################################WORKDIR ####################################
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# cat Dockerfile
+
+#ARG file_name="nginx.conf"
+FROM nginx:1.26.2-alpine-slim
+ARG file_name="nginx.conf"
+ENV myvar="Kunal"
+WORKDIR /app                                                            ###########Defining WORKDIR
+RUN apk add bash curl
+#COPY ${file_name} /etc/nginx/${file_name}
+COPY index.html index.html
+EXPOSE 8090
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker build -t kunal3237/imagewithrunandexpose .; docker run --name  myapp -p 8081:80 -d kunal3237/imagewithrunandexpose;docker ps
+Sending build context to Docker daemon  14.34kB
+Step 1/7 : FROM nginx:1.26.2-alpine-slim
+ ---> 008f853bbf53
+Step 2/7 : ARG file_name="nginx.conf"
+ ---> Running in 35ce5b600206
+Removing intermediate container 35ce5b600206
+ ---> b18c646856f9
+Step 3/7 : ENV myvar="Kunal"
+ ---> Running in c6f0b6740688
+Removing intermediate container c6f0b6740688
+ ---> 89c8cc9e237b
+Step 4/7 : WORKDIR /app
+ ---> Running in 7e582b196323
+Removing intermediate container 7e582b196323
+ ---> 6fb342bb6e9d
+Step 5/7 : RUN apk add bash curl
+ ---> Running in 828304dd1684
+fetch https://dl-cdn.alpinelinux.org/alpine/v3.20/main/x86_64/APKINDEX.tar.gz
+fetch https://dl-cdn.alpinelinux.org/alpine/v3.20/community/x86_64/APKINDEX.tar.gz
+(1/14) Installing ncurses-terminfo-base (6.4_p20240420-r2)
+(2/14) Installing libncursesw (6.4_p20240420-r2)
+(3/14) Installing readline (8.2.10-r0)
+(4/14) Installing bash (5.2.26-r0)
+Executing bash-5.2.26-r0.post-install
+(5/14) Installing ca-certificates (20241121-r1)
+(6/14) Installing brotli-libs (1.1.0-r2)
+(7/14) Installing c-ares (1.33.1-r0)
+(8/14) Installing libunistring (1.2-r0)
+(9/14) Installing libidn2 (2.3.7-r0)
+(10/14) Installing nghttp2-libs (1.62.1-r0)
+(11/14) Installing libpsl (0.21.5-r1)
+(12/14) Installing zstd-libs (1.5.6-r0)
+(13/14) Installing libcurl (8.11.1-r0)
+(14/14) Installing curl (8.11.1-r0)
+Executing busybox-1.36.1-r29.trigger
+Executing ca-certificates-20241121-r1.trigger
+OK: 20 MiB in 32 packages
+Removing intermediate container 828304dd1684
+ ---> fad299cb8d14
+Step 6/7 : COPY index.html index.html
+ ---> 30413d15aaaa
+Step 7/7 : EXPOSE 8090
+ ---> Running in 20d1dab3bd73
+Removing intermediate container 20d1dab3bd73
+ ---> 35ff9bae1235
+Successfully built 35ff9bae1235
+Successfully tagged kunal3237/imagewithrunandexpose:latest
+5d5d9546393c713b2a7853b36484f7fd16439d3be779a18b8453eaf8af53400a
+CONTAINER ID   IMAGE                             COMMAND                  CREATED         STATUS                  PORTS                                             NAMES
+5d5d9546393c   kunal3237/imagewithrunandexpose   "/docker-entrypoint.…"   4 seconds ago   Up Less than a second   8090/tcp, 0.0.0.0:8081->80/tcp, :::8081->80/tcp   myapp
+0fc484d9bd09   kindest/node:v1.28.0              "/usr/local/bin/entr…"   5 weeks ago     Up 8 hours                                                                kind-worker3
+14d475883ba7   kindest/node:v1.28.0              "/usr/local/bin/entr…"   5 weeks ago     Up 8 hours                                                                kind-worker2
+b0ede2a1a2bb   kindest/node:v1.28.0              "/usr/local/bin/entr…"   5 weeks ago     Up 8 hours              127.0.0.1:36811->6443/tcp                         kind-control-plane
+80829f8b2dec   kindest/node:v1.28.0              "/usr/local/bin/entr…"   5 weeks ago     Up 8 hours                                                                kind-worker
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker exec -it myapp bash
+5d5d9546393c:/app# ls
+index.html                                                                    ####File copied in WORKDIR, If WORKDIR not used, file will be stored in / unless absolute path  not provided
+5d5d9546393c:/app# 
+
+###########################################CMD##########################################
+
+The CMD instruction specifies the default command to run when starting a container from the image.
+
+It can be overridden by specifying a different command during docker run
+
+Only the last CMD instruction in the Dockerfile takes effect.
+
+Only ONe CMD should be mentioned in the Dockerfile, Otherwise it gives error for build context
+###########################################################
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# cat Dockerfile
+FROM python:3.14.0a4-alpine3.21
+
+LABEL Author: Kunal Sharma
+WORKDIR /app
+RUN apk add bash
+COPY index.html index.html
+COPY requirement.txt .
+RUN pip3 install -r requirement.txt
+ADD https://raw.githubusercontent.com/kunal3237/PythonScripts/main/api-json-data.py .
+
+CMD ["python3","api-json-data.py"]                                        #####CMD
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker build -t kunal3237/imagewithrunandexpose .; docker run --name  myapp -p 8081:80 -d kunal3237/imagewithrunandexpose;docker ps;docker exec -it myapp bash
+Sending build context to Docker daemon  15.36kB
+Step 1/9 : FROM python:3.14.0a4-alpine3.21
+3.14.0a4-alpine3.21: Pulling from library/python
+Digest: sha256:6c6787b880f9746036994496b55d73e027bca93aee3e5992f62af35c60c67354
+Status: Downloaded newer image for python:3.14.0a4-alpine3.21
+ ---> aa236fd83469
+Step 2/9 : LABEL Author: Kunal Sharma
+ ---> Running in 1c23d7d94a86
+Removing intermediate container 1c23d7d94a86
+ ---> bb4bade676f5
+Step 3/9 : WORKDIR /app
+ ---> Running in 0af6f8e3d751
+Removing intermediate container 0af6f8e3d751
+ ---> 37b8703dc0ab
+Step 4/9 : RUN apk add bash
+ ---> Running in 22eebb17e02d
+fetch https://dl-cdn.alpinelinux.org/alpine/v3.21/main/x86_64/APKINDEX.tar.gz
+fetch https://dl-cdn.alpinelinux.org/alpine/v3.21/community/x86_64/APKINDEX.tar.gz
+(1/1) Installing bash (5.2.37-r0)
+Executing bash-5.2.37-r0.post-install
+Executing busybox-1.37.0-r9.trigger
+OK: 11 MiB in 29 packages
+Removing intermediate container 22eebb17e02d
+ ---> 497d84fc7b05
+Step 5/9 : COPY index.html index.html
+ ---> 6a7548f84c0f
+Step 6/9 : COPY requirement.txt .
+ ---> 93e60d345ece
+Step 7/9 : RUN pip3 install -r requirement.txt
+ ---> Running in b960ee355a39
+Collecting requests (from -r requirement.txt (line 1))
+  Downloading requests-2.32.3-py3-none-any.whl.metadata (4.6 kB)
+Collecting datetime (from -r requirement.txt (line 2))
+  Downloading DateTime-5.5-py3-none-any.whl.metadata (33 kB)
+Collecting charset-normalizer<4,>=2 (from requests->-r requirement.txt (line 1))
+  Downloading charset_normalizer-3.4.1-py3-none-any.whl.metadata (35 kB)
+Collecting idna<4,>=2.5 (from requests->-r requirement.txt (line 1))
+  Downloading idna-3.10-py3-none-any.whl.metadata (10 kB)
+Collecting urllib3<3,>=1.21.1 (from requests->-r requirement.txt (line 1))
+  Downloading urllib3-2.3.0-py3-none-any.whl.metadata (6.5 kB)
+Collecting certifi>=2017.4.17 (from requests->-r requirement.txt (line 1))
+  Downloading certifi-2024.12.14-py3-none-any.whl.metadata (2.3 kB)
+Collecting zope.interface (from datetime->-r requirement.txt (line 2))
+  Downloading zope.interface-7.2.tar.gz (252 kB)
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Getting requirements to build wheel: started
+  Getting requirements to build wheel: finished with status 'done'
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Collecting pytz (from datetime->-r requirement.txt (line 2))
+  Downloading pytz-2024.2-py2.py3-none-any.whl.metadata (22 kB)
+Collecting setuptools (from zope.interface->datetime->-r requirement.txt (line 2))
+  Downloading setuptools-75.8.0-py3-none-any.whl.metadata (6.7 kB)
+Downloading requests-2.32.3-py3-none-any.whl (64 kB)
+Downloading DateTime-5.5-py3-none-any.whl (52 kB)
+Downloading certifi-2024.12.14-py3-none-any.whl (164 kB)
+Downloading charset_normalizer-3.4.1-py3-none-any.whl (49 kB)
+Downloading idna-3.10-py3-none-any.whl (70 kB)
+Downloading urllib3-2.3.0-py3-none-any.whl (128 kB)
+Downloading pytz-2024.2-py2.py3-none-any.whl (508 kB)
+Downloading setuptools-75.8.0-py3-none-any.whl (1.2 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 2.1 MB/s eta 0:00:00
+Building wheels for collected packages: zope.interface
+  Building wheel for zope.interface (pyproject.toml): started
+  Building wheel for zope.interface (pyproject.toml): finished with status 'done'
+  Created wheel for zope.interface: filename=zope.interface-7.2-cp314-cp314-linux_x86_64.whl size=196887 sha256=886ea02bd73b66bac4cb5a2122de39b23a3fef4189c04a1cbbff777d6d9fddc4
+  Stored in directory: /root/.cache/pip/wheels/20/03/ef/c244af1b594605c1280760b7c1c98f7007ab9ae9b4e549b8b5
+Successfully built zope.interface
+Installing collected packages: pytz, urllib3, setuptools, idna, charset-normalizer, certifi, zope.interface, requests, datetime
+Successfully installed certifi-2024.12.14 charset-normalizer-3.4.1 datetime-5.5 idna-3.10 pytz-2024.2 requests-2.32.3 setuptools-75.8.0 urllib3-2.3.0 zope.interface-7.2
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable.It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+Removing intermediate container b960ee355a39
+ ---> 3a06e8889793
+Step 8/9 : ADD https://raw.githubusercontent.com/kunal3237/PythonScripts/main/api-json-data.py .
+Downloading  1.981kB
+ ---> 4f1cce1533a9
+Step 9/9 : CMD ["python3","api-json-data.py"]
+ ---> Running in 7cc1fef71e7f
+Removing intermediate container 7cc1fef71e7f
+ ---> acc8ae82b653
+Successfully built acc8ae82b653
+Successfully tagged kunal3237/imagewithrunandexpose:latest
+c5f88f5b2b10ae84d0726bb882e0f1965c968372272b9bb93e04dbe593a6b3d8
+CONTAINER ID   IMAGE                             COMMAND                  CREATED         STATUS                  PORTS                                   NAMES
+c5f88f5b2b10   kunal3237/imagewithrunandexpose   "python3 api-json-da…"   4 seconds ago   Up Less than a second   0.0.0.0:8081->80/tcp, :::8081->80/tcp   myapp
+0fc484d9bd09   kindest/node:v1.28.0              "/usr/local/bin/entr…"   5 weeks ago     Up 9 hours                                                      kind-worker3
+14d475883ba7   kindest/node:v1.28.0              "/usr/local/bin/entr…"   5 weeks ago     Up 9 hours                                                      kind-worker2
+b0ede2a1a2bb   kindest/node:v1.28.0              "/usr/local/bin/entr…"   5 weeks ago     Up 9 hours              127.0.0.1:36811->6443/tcp               kind-control-plane
+80829f8b2dec   kindest/node:v1.28.0              "/usr/local/bin/entr…"   5 weeks ago     Up 9 hours                                                      kind-worker
+c5f88f5b2b10:/app# root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+c5f88f5b2b10:/app# root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker logs myapp
+Date : 2025-01-20
+TimeZone: America/New_York
+First Light: 5:50:53 AM
+Last Light: 6:49:48 PM
+Day Length: 9:52:28
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker inspect myapp --format='{{ json .Config.Cmd }}' | jq
+[
+  "python3",
+  "api-json-data.py"
+]
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+##########################################################################
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# cat Dockerfile
+FROM nginx:1.27-alpine-slim
+
+LABEL KUNAL:SHARMA
+COPY index.html /usr/share/nginx/html
+CMD ["nginx","-g","daemon off"]
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker build -t kunal3237/imagewithcmd .
+Sending build context to Docker daemon  16.38kB
+Error response from daemon: failed to parse Dockerfile: LABEL must have two arguments
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# vi Dockerfile
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker build -t kunal3237/imagewithcmd .
+Sending build context to Docker daemon  16.38kB
+Step 1/4 : FROM nginx:1.27-alpine-slim
+ ---> 9765c8de364c
+Step 2/4 : LABEL KUNAL: SHARMA
+ ---> Running in 639ae4b6db55
+Removing intermediate container 639ae4b6db55
+ ---> 6c7c39d13c0a
+Step 3/4 : COPY index.html /usr/share/nginx/html
+ ---> 53cb66535bde
+Step 4/4 : CMD ["nginx","-g","daemon off"]
+ ---> Running in 1cecdc78e0ea
+Removing intermediate container 1cecdc78e0ea
+ ---> 15a1d3628758
+Successfully built 15a1d3628758
+Successfully tagged kunal3237/imagewithcmd:latest
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker run --name myapp -it kunal3237/imagewithcmd sh
+/ # ls
+bin                   docker-entrypoint.sh  lib                   opt                   run                   sys                   var
+dev                   etc                   media                 proc                  sbin                  tmp
+docker-entrypoint.d   home                  mnt                   root                  srv                   usr
+/ # ls /usr/share/nginx/html
+50x.html    index.html
+/ # 
+
+########################Starting nginx Manually ########################
+/ # ps
+PID   USER     TIME  COMMAND
+    1 root      0:00 sh
+    9 root      0:00 ps
+/ # nginx -f daemon off
+nginx: invalid option: "f"
+/ # nginx -g daemon off
+nginx: invalid option: "off"
+/ # nginx -g 'daemon off'
+2025/01/20 13:11:51 [emerg] 12#12: unexpected end of parameter, expecting ";" in command line
+nginx: [emerg] unexpected end of parameter, expecting ";" in command line
+/ # nginx -g 'daemon off;'
+2025/01/20 13:12:08 [notice] 13#13: using the "epoll" event method
+2025/01/20 13:12:08 [notice] 13#13: nginx/1.27.3
+2025/01/20 13:12:08 [notice] 13#13: built by gcc 13.2.1 20240309 (Alpine 13.2.1_git20240309) 
+2025/01/20 13:12:08 [notice] 13#13: OS: Linux 6.8.0-51-generic
+2025/01/20 13:12:08 [notice] 13#13: getrlimit(RLIMIT_NOFILE): 1048576:1048576
+2025/01/20 13:12:08 [notice] 13#13: start worker processes
+2025/01/20 13:12:08 [notice] 13#13: start worker process 14
+2025/01/20 13:12:08 [notice] 13#13: start worker process 15
+2025/01/20 13:12:08 [notice] 13#13: start worker process 16
+2025/01/20 13:12:08 [notice] 13#13: start worker process 17
+
+
+#######################After starting it manually #############################
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker exec -it myapp sh
+/ # ps
+PID   USER     TIME  COMMAND
+    1 root      0:00 sh
+   13 root      0:00 nginx: master process nginx -g daemon off;
+   14 nginx     0:00 nginx: worker process
+   15 nginx     0:00 nginx: worker process
+   16 nginx     0:00 nginx: worker process
+   17 nginx     0:00 nginx: worker process
+   18 root      0:00 sh
+   24 root      0:00 ps
+/ # 
+
+
