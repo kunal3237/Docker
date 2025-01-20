@@ -18,81 +18,105 @@ root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice#
 
 ###############################################################
 
-root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker build --build-arg NGINX_VERSION=1.27 -t kunal3237/imageswithrunexpose .
-Sending build context to Docker daemon   12.8kB
-Step 1/7 : ARG NGINX_VERSION=1.26
-Step 2/7 : FROM nginx:${NGINX_VERSION}-alpine-slim
- ---> 9765c8de364c
-Step 3/7 : LABEL Author: Kunal Sharma
- ---> Running in 405491d752cc
-Removing intermediate container 405491d752cc
- ---> 036fc1d4c2c6
-Step 4/7 : LABEL Creation Date: Jan 20, 2025
- ---> Running in 75ffd1916649
-Removing intermediate container 75ffd1916649
- ---> 5f33173dceb8
-Step 5/7 : RUN apk --no-cache add bash
- ---> Running in b2be5d0db51a
-fetch https://dl-cdn.alpinelinux.org/alpine/v3.20/main/x86_64/APKINDEX.tar.gz
-fetch https://dl-cdn.alpinelinux.org/alpine/v3.20/community/x86_64/APKINDEX.tar.gz
-(1/4) Installing ncurses-terminfo-base (6.4_p20240420-r2)
-(2/4) Installing libncursesw (6.4_p20240420-r2)
-(3/4) Installing readline (8.2.10-r0)
-(4/4) Installing bash (5.2.26-r0)
-Executing bash-5.2.26-r0.post-install
-Executing busybox-1.36.1-r29.trigger
-OK: 15 MiB in 22 packages
-Removing intermediate container b2be5d0db51a
- ---> 8d23edea1de6
-Step 6/7 : COPY index.html /usr/share/nginx/html
- ---> b046dfd944bd
-Step 7/7 : EXPOSE 8096
- ---> Running in dbc7ef2c22d9
-Removing intermediate container dbc7ef2c22d9
- ---> 86d6af597db4
-Successfully built 86d6af597db4
-Successfully tagged kunal3237/imageswithrunexpose:latest
 root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# cat Dockerfile
 ARG NGINX_VERSION=1.26
+
 FROM nginx:${NGINX_VERSION}-alpine-slim
-
-LABEL Author: Kunal Sharma
-LABEL Creation Date: Jan 20, 2025
-RUN apk --no-cache add bash
-
-COPY index.html /usr/share/nginx/html
-
-EXPOSE 8096
+RUN apk add bash curl
+RUN echo "$NGINX_VERSION"
+COPY nginx.conf /etc/nginx/nginx.conf                         #############Created a nginx file in local with chages to run the nginx on port 8090, PLease make sure you set the port in config file
+EXPOSE 8090                                          ######used only Build time, need to set -p to use it for running container
 root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
 
+####################################################################
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker build -t kunal3237/imagewithrunandexpose .
+Sending build context to Docker daemon  14.34kB
+Step 1/6 : ARG NGINX_VERSION=1.26
+Step 2/6 : FROM nginx:${NGINX_VERSION}-alpine-slim
+ ---> 008f853bbf53
+Step 3/6 : RUN apk add bash curl
+ ---> Using cache
+ ---> 6e904a421df4
+Step 4/6 : RUN echo "$NGINX_VERSION"
+ ---> Using cache
+ ---> 4a7418704f21
+Step 5/6 : COPY nginx.conf /etc/nginx/nginx.conf
+ ---> 49e46ac6cc53
+Step 6/6 : EXPOSE 8090
+ ---> Running in eb85eaf2ce38
+Removing intermediate container eb85eaf2ce38
+ ---> f207c2bc242c
+Successfully built f207c2bc242c
+Successfully tagged kunal3237/imagewithrunandexpose:latest
 
-###########################################################
 
-root@kunal-Lenovo-U410:/home/kunal# docker run -d -p 8091:8096 --name myapp kunal3237/imageswithrunexpose                  ######-P actually maps the port
-07d2604e56dabc42fe324eb7403e9a517bf1c26ac9968191f725b03934b2c7e3
-root@kunal-Lenovo-U410:/home/kunal# docker ps
-CONTAINER ID   IMAGE                           COMMAND                  CREATED          STATUS          PORTS                                               NAMES
-07d2604e56da   kunal3237/imageswithrunexpose   "/docker-entrypoint.…"   16 seconds ago   Up 10 seconds   80/tcp, 0.0.0.0:8091->8096/tcp, :::8091->8096/tcp   myapp
-0fc484d9bd09   kindest/node:v1.28.0            "/usr/local/bin/entr…"   5 weeks ago      Up 5 hours                                                          kind-worker3
-14d475883ba7   kindest/node:v1.28.0            "/usr/local/bin/entr…"   5 weeks ago      Up 5 hours                                                          kind-worker2
-b0ede2a1a2bb   kindest/node:v1.28.0            "/usr/local/bin/entr…"   5 weeks ago      Up 5 hours      127.0.0.1:36811->6443/tcp                           kind-control-plane
-80829f8b2dec   kindest/node:v1.28.0            "/usr/local/bin/entr…"   5 weeks ago      Up 5 hours                                                          kind-worker
+a0b3d8ed9c138cb38c7f433316d8f00fdb59bb20f274cdf903a135d60fa270b8
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker ps
+CONTAINER ID   IMAGE                             COMMAND                  CREATED          STATUS          PORTS                                               NAMES
+a0b3d8ed9c13   kunal3237/imagewithrunandexpose   "/docker-entrypoint.…"   32 seconds ago   Up 26 seconds   80/tcp, 0.0.0.0:8081->8090/tcp, :::8081->8090/tcp   myapp
+0fc484d9bd09   kindest/node:v1.28.0              "/usr/local/bin/entr…"   5 weeks ago      Up 7 hours                                                          kind-worker3
+14d475883ba7   kindest/node:v1.28.0              "/usr/local/bin/entr…"   5 weeks ago      Up 7 hours                                                          kind-worker2
+b0ede2a1a2bb   kindest/node:v1.28.0              "/usr/local/bin/entr…"   5 weeks ago      Up 7 hours      127.0.0.1:36811->6443/tcp                           kind-control-plane
+80829f8b2dec   kindest/node:v1.28.0              "/usr/local/bin/entr…"   5 weeks ago      Up 7 hours                                                          kind-worker
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# curl http://localhost:8081
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+html { color-scheme: light dark; }
+body { width: 35em; margin: 0 auto;
+font-family: Tahoma, Verdana, Arial, sans-serif; }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
 
-root@kunal-Lenovo-U410:/home/kunal# docker inspect 07d2604e56da --format='{{json .Config.ExposedPorts}}' | jq
-{
-  "80/tcp": {},
-  "8096/tcp": {}                                                                        ##################Exposed port of the container
-}
-root@kunal-Lenovo-U410:/home/kunal# 
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
 
-root@kunal-Lenovo-U410:/home/kunal# docker exec -it 07d2604e56da bash
-07d2604e56da:/# ps
-PID   USER     TIME  COMMAND
-    1 root      0:00 nginx: master process nginx -g daemon off;
-   30 nginx     0:00 nginx: worker process
-   31 nginx     0:00 nginx: worker process
-   32 nginx     0:00 nginx: worker process
-   33 nginx     0:00 nginx: worker process
-   34 root      0:00 bash
-   39 root      0:00 ps
-07d2604e56da:/# 
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+
+###############################################################
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker exec -it a0b3d8ed9c13 bash
+a0b3d8ed9c13:/# netstat -ptlan
+Active Internet connections (servers and established)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
+tcp        0      0 0.0.0.0:8090            0.0.0.0:*               LISTEN      1/nginx: master pro
+tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN      1/nginx: master pro
+tcp        0      0 :::80                   :::*                    LISTEN      1/nginx: master pro
+a0b3d8ed9c13:/# 
+
+a0b3d8ed9c13:/# curl http://localhost:8090
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+html { color-scheme: light dark; }
+body { width: 35em; margin: 0 auto;
+font-family: Tahoma, Verdana, Arial, sans-serif; }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+a0b3d8ed9c13:/# 
+
+
