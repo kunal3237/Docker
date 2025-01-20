@@ -1,0 +1,292 @@
+###############Test case for ADD or COPY####################
+
+
+Add copy the files and Extract the archives, Also Suports URL , Be careful while using it for URLs. Use COPY for local files.
+
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# cat Dockerfile
+FROM nginx:alpine-slim
+
+# Custom Labels
+
+LABEL Author: Kunal Sharma
+LABEL Version: 1.0.0
+LABEL Description : "Creating images with lables"
+
+#OCI Labels
+
+LABEL org.opencontainers.image.authors : Kunal Sharma
+LABEL org.opencontainers.image.created : Jan 19 2025
+
+
+#Copying the files from source to dest
+
+#COPY index.html /usr/share/index.html
+ #Add used
+
+ADD index.tar.gz /usr/share/nginx/html                                                                ##Using add to copy the tar file to nginx directory
+
+##############################################################
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker build -t kunal3237/imagewithadd:1.0.0 .
+Sending build context to Docker daemon  9.216kB
+Step 1/7 : FROM nginx:alpine-slim
+ ---> 9765c8de364c
+Step 2/7 : LABEL Author: Kunal Sharma
+ ---> Running in dcf608d6052a
+Removing intermediate container dcf608d6052a
+ ---> 820ff6928fff
+Step 3/7 : LABEL Version: 1.0.0
+ ---> Running in d133ae605948
+Removing intermediate container d133ae605948
+ ---> ab9ad6c4497f
+Step 4/7 : LABEL Description : "Creating images with lables"
+ ---> Running in 9beef9329574
+Removing intermediate container 9beef9329574
+ ---> e9e81c713946
+Step 5/7 : LABEL org.opencontainers.image.authors : Kunal Sharma
+ ---> Running in 2d5283cc330e
+Removing intermediate container 2d5283cc330e
+ ---> 73883906fd41
+Step 6/7 : LABEL org.opencontainers.image.created : Jan 19 2025
+ ---> Running in ffb962d11625
+Removing intermediate container ffb962d11625
+ ---> 06274de43681
+Step 7/7 : ADD index.tar.gz /usr/share/nginx/html
+ ---> 09315e6f5cfb
+Successfully built 09315e6f5cfb
+Successfully tagged kunal3237/imagewithadd:1.0.0
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker images
+REPOSITORY                      TAG              IMAGE ID       CREATED         SIZE
+kunal3237/imagewithadd          1.0.0            09315e6f5cfb   5 seconds ago   11.8MB
+myubuntu                        latest           31f544b65ac1   44 hours ago    124MB
+python                          3.14-rc-alpine   aa236fd83469   5 days ago      45.5MB
+nginx                           latest           9bea9f2796e2   7 weeks ago     192MB
+nginx                           alpine-slim      9765c8de364c   7 weeks ago     11.8MB
+ubuntu                          latest           b1d9df8ab815   2 months ago    78.1MB
+ghcr.io/stacksimplify/mynginx   v1               2a6b6d4c59d5   3 months ago    192MB
+stacksimplify/mynginx           v1               808338d34e40   4 months ago    188MB
+kindest/node                    v1.28.0          ad70201dab13   17 months ago   950MB
+hello-world                     latest           d2c94e258dcb   20 months ago   13.3kB
+oracle/database                 19.3.0-ee        0291ee4fa2ff   2 years ago     6.54GB
+oraclelinux                     7-slim           b6816fd9cf33   2 years ago     135MB
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+
+########################################Runing the container#############################################
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker run -d -p 8095:80 --name myapp kunal3237/imagewithadd:1.0.0 
+dca99ce5913c3d13f8987e0b9f9ec63b29f6f8daeb04507165f88593bc46d640
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker ps 
+CONTAINER ID   IMAGE                          COMMAND                  CREATED          STATUS         PORTS                                   NAMES
+dca99ce5913c   kunal3237/imagewithadd:1.0.0   "/docker-entrypoint.…"   10 seconds ago   Up 5 seconds   0.0.0.0:8095->80/tcp, :::8095->80/tcp   myapp
+0fc484d9bd09   kindest/node:v1.28.0           "/usr/local/bin/entr…"   5 weeks ago      Up 2 hours                                             kind-worker3
+14d475883ba7   kindest/node:v1.28.0           "/usr/local/bin/entr…"   5 weeks ago      Up 2 hours                                             kind-worker2
+b0ede2a1a2bb   kindest/node:v1.28.0           "/usr/local/bin/entr…"   5 weeks ago      Up 2 hours     127.0.0.1:36811->6443/tcp               kind-control-plane
+80829f8b2dec   kindest/node:v1.28.0           "/usr/local/bin/entr…"   5 weeks ago      Up 2 hours                                             kind-worker
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# curl http://localhost:8095
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StackSimplify</title>
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      text-align: center; 
+      padding: 50px; 
+      background-color: rgb(197, 144, 144);
+    }
+    h1 { font-size: 50px; }
+    h2 { font-size: 40px; }
+    h3 { font-size: 30px; }
+    p { font-size: 20px; }
+  </style>
+</head>
+<body>
+  <h1>Welcome to Learn Docker</h1>
+  <h2>Docker Image BUILD, RUN, TAG and PUSH to Docker Hubi,1</h2>
+  <p>Learn technology through practical, real-world demos.</p>
+  <p>Application Version: v1</p>
+</body>
+</html>
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+
+#################################################
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker exec -it dca99ce5913c sh
+/ # pwd
+/
+/ # ls
+bin                   docker-entrypoint.sh  lib                   opt                   run                   sys                   var
+dev                   etc                   media                 proc                  sbin                  tmp
+docker-entrypoint.d   home                  mnt                   root                  srv                   usr
+/ # cd /usr/share/nginx/html
+/usr/share/nginx/html # ls -ltr
+total 16
+-rw-r--r--    1 root     root           497 Nov 26 17:22 50x.html
+-rw-r--r--    1 root     root           679 Jan 20 05:23 index2.html
+-rw-r--r--    1 root     root           679 Jan 20 05:23 index3.html                                                ####Files extracted
+-rw-r--r--    1 root     root           679 Jan 20 05:25 index.html
+/usr/share/nginx/html # 
+
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker exec -it dca99ce5913c sh
+/ # ps
+PID   USER     TIME  COMMAND
+    1 root      0:00 nginx: master process nginx -g daemon off;                                                      #root user
+   30 nginx     0:00 nginx: worker process
+   31 nginx     0:00 nginx: worker process
+   32 nginx     0:00 nginx: worker process
+   33 nginx     0:00 nginx: worker process
+   48 root      0:00 sh
+   54 root      0:00 ps
+/ # 
+
+##############################################Using UJRL with ADD ############################################
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# cat Dockerfile
+FROM python:slim
+
+WORKDIR /app
+COPY requirement.txt /app/requirement.txt
+
+RUN pip3 install -r requirement.txt
+ADD https://raw.githubusercontent.com/kunal3237/PythonScripts/main/api-json-data.py /app/api-json-data.py                                            ######Use Raw, Else it will fail with unexpected html errors
+
+CMD ["python3","/app/api-json-data.py"]                                                                                                        ###Use Double Quotes, Else it will not work with single quote
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker build -t kunal3237/imagewithadd .
+Sending build context to Docker daemon  11.78kB
+Step 1/6 : FROM python:slim
+ ---> 1121ea67ee63
+Step 2/6 : WORKDIR /app
+ ---> Using cache
+ ---> a0e35f8c2c0a
+Step 3/6 : COPY requirement.txt /app/requirement.txt
+ ---> f0f89e45a194
+Step 4/6 : RUN pip3 install -r requirement.txt
+ ---> Running in b65bf42df2f9
+Collecting requests (from -r requirement.txt (line 1))
+  Downloading requests-2.32.3-py3-none-any.whl.metadata (4.6 kB)
+Collecting charset-normalizer<4,>=2 (from requests->-r requirement.txt (line 1))
+  Downloading charset_normalizer-3.4.1-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (35 kB)
+Collecting idna<4,>=2.5 (from requests->-r requirement.txt (line 1))
+  Downloading idna-3.10-py3-none-any.whl.metadata (10 kB)
+Collecting urllib3<3,>=1.21.1 (from requests->-r requirement.txt (line 1))
+  Downloading urllib3-2.3.0-py3-none-any.whl.metadata (6.5 kB)
+Collecting certifi>=2017.4.17 (from requests->-r requirement.txt (line 1))
+  Downloading certifi-2024.12.14-py3-none-any.whl.metadata (2.3 kB)
+Downloading requests-2.32.3-py3-none-any.whl (64 kB)
+Downloading certifi-2024.12.14-py3-none-any.whl (164 kB)
+Downloading charset_normalizer-3.4.1-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (144 kB)
+Downloading idna-3.10-py3-none-any.whl (70 kB)
+Downloading urllib3-2.3.0-py3-none-any.whl (128 kB)
+Installing collected packages: urllib3, idna, charset-normalizer, certifi, requests
+Successfully installed certifi-2024.12.14 charset-normalizer-3.4.1 idna-3.10 requests-2.32.3 urllib3-2.3.0
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable.It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+Removing intermediate container b65bf42df2f9
+ ---> bbf9ca823316
+Step 5/6 : ADD https://raw.githubusercontent.com/kunal3237/PythonScripts/main/api-json-data.py /app/api-json-data.py
+Downloading   1.98kB
+ ---> 3f4455901032
+Step 6/6 : CMD ["python3","/app/api-json-data.py"]
+ ---> Running in f5dd55c75cfe
+Removing intermediate container f5dd55c75cfe
+ ---> 4dbf24974316
+Successfully built 4dbf24974316
+Successfully tagged kunal3237/imagewithadd:latest
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker run --name myapp  kunal3237/imagewithadd
+Date : 2025-01-20
+TimeZone: America/New_York
+First Light: 5:50:53 AM
+Last Light: 6:49:48 PM
+Day Length: 9:52:28
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+
+
+#####################################################################################
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study# docker exec -it 4f1533557dad sh                        #Added time in the python to login into the container and see the files
+# ls
+api-json-data.py  requirement.txt
+# root@kunal-Lenovo-U410:/home/kunal/Docker-Study# 
+
+#############################################################################
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# cat Dockerfile
+FROM python:slim
+
+WORKDIR /app
+COPY requirement.txt /app/requirement.txt
+
+RUN pip3 install -r requirement.txt
+ADD https://raw.githubusercontent.com/kunal3237/PythonScripts/main/api-json-data.py /app/api-json-data.py
+
+CMD ["python3","/app/api-json-data.py"]
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# cat requirement.txt 
+requests
+datetime
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+######################################################################################
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker build -t kunal3237/imagewithadd .
+Sending build context to Docker daemon  11.78kB
+Step 1/6 : FROM python:slim
+ ---> 1121ea67ee63
+Step 2/6 : WORKDIR /app
+ ---> Using cache
+ ---> a0e35f8c2c0a
+Step 3/6 : COPY requirement.txt /app/requirement.txt
+ ---> 6aac8613b7d2
+Step 4/6 : RUN pip3 install -r requirement.txt
+ ---> Running in 67e35cac53a2
+Collecting requests (from -r requirement.txt (line 1))
+  Downloading requests-2.32.3-py3-none-any.whl.metadata (4.6 kB)
+Collecting datetime (from -r requirement.txt (line 2))
+  Downloading DateTime-5.5-py3-none-any.whl.metadata (33 kB)
+Collecting charset-normalizer<4,>=2 (from requests->-r requirement.txt (line 1))
+  Downloading charset_normalizer-3.4.1-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (35 kB)
+Collecting idna<4,>=2.5 (from requests->-r requirement.txt (line 1))
+  Downloading idna-3.10-py3-none-any.whl.metadata (10 kB)
+Collecting urllib3<3,>=1.21.1 (from requests->-r requirement.txt (line 1))
+  Downloading urllib3-2.3.0-py3-none-any.whl.metadata (6.5 kB)
+Collecting certifi>=2017.4.17 (from requests->-r requirement.txt (line 1))
+  Downloading certifi-2024.12.14-py3-none-any.whl.metadata (2.3 kB)
+Collecting zope.interface (from datetime->-r requirement.txt (line 2))
+  Downloading zope.interface-7.2-cp313-cp313-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (44 kB)
+Collecting pytz (from datetime->-r requirement.txt (line 2))
+  Downloading pytz-2024.2-py2.py3-none-any.whl.metadata (22 kB)
+Collecting setuptools (from zope.interface->datetime->-r requirement.txt (line 2))
+  Downloading setuptools-75.8.0-py3-none-any.whl.metadata (6.7 kB)
+Downloading requests-2.32.3-py3-none-any.whl (64 kB)
+Downloading DateTime-5.5-py3-none-any.whl (52 kB)
+Downloading certifi-2024.12.14-py3-none-any.whl (164 kB)
+Downloading charset_normalizer-3.4.1-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (144 kB)
+Downloading idna-3.10-py3-none-any.whl (70 kB)
+Downloading urllib3-2.3.0-py3-none-any.whl (128 kB)
+Downloading pytz-2024.2-py2.py3-none-any.whl (508 kB)
+Downloading zope.interface-7.2-cp313-cp313-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl (264 kB)
+Downloading setuptools-75.8.0-py3-none-any.whl (1.2 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 373.1 kB/s eta 0:00:00
+Installing collected packages: pytz, urllib3, setuptools, idna, charset-normalizer, certifi, zope.interface, requests, datetime
+Successfully installed certifi-2024.12.14 charset-normalizer-3.4.1 datetime-5.5 idna-3.10 pytz-2024.2 requests-2.32.3 setuptools-75.8.0 urllib3-2.3.0 zope.interface-7.2
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable.It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+Removing intermediate container 67e35cac53a2
+ ---> b80345ad608c
+Step 5/6 : ADD https://raw.githubusercontent.com/kunal3237/PythonScripts/main/api-json-data.py /app/api-json-data.py
+Downloading  2.007kB
+ ---> a28c508ce43a
+Step 6/6 : CMD ["python3","/app/api-json-data.py"]
+ ---> Running in af833677ff0b
+Removing intermediate container af833677ff0b
+ ---> 14ca77254365
+Successfully built 14ca77254365
+Successfully tagged kunal3237/imagewithadd:latest
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker run --name myapp  kunal3237/imagewithadd
+Date : 2025-01-20
+TimeZone: America/New_York
+First Light: 5:50:53 AM
+Last Light: 6:49:48 PM
+Day Length: 9:52:28
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
