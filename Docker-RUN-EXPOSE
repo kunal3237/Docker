@@ -1,0 +1,87 @@
+######################Use RUN and EXPOSE Docker Instructions#####################
+
+RUN executes a command 
+EXPOSE , expose mentioned port of the container
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# cat Dockerfile
+ARG NGINX_VERSION=1.26
+FROM nginx:${NGINX_VERSION}-alpine-slim
+
+LABEL Author: Kunal Sharma
+LABEL Creation Date: Jan 20, 2025
+RUN apk --no-cache add bash                                                  #####Using RUN to run a command, apk is alpine linux package manager, same like pip3 in python
+
+COPY index.html /usr/share/nginx/html
+
+EXPOSE 8096                                                                  ########Exposing th container on port 8096 of the host
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+###############################################################
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker build --build-arg NGINX_VERSION=1.27 -t kunal3237/imageswithrunexpose .
+Sending build context to Docker daemon   12.8kB
+Step 1/7 : ARG NGINX_VERSION=1.26
+Step 2/7 : FROM nginx:${NGINX_VERSION}-alpine-slim
+ ---> 9765c8de364c
+Step 3/7 : LABEL Author: Kunal Sharma
+ ---> Running in 405491d752cc
+Removing intermediate container 405491d752cc
+ ---> 036fc1d4c2c6
+Step 4/7 : LABEL Creation Date: Jan 20, 2025
+ ---> Running in 75ffd1916649
+Removing intermediate container 75ffd1916649
+ ---> 5f33173dceb8
+Step 5/7 : RUN apk --no-cache add bash
+ ---> Running in b2be5d0db51a
+fetch https://dl-cdn.alpinelinux.org/alpine/v3.20/main/x86_64/APKINDEX.tar.gz
+fetch https://dl-cdn.alpinelinux.org/alpine/v3.20/community/x86_64/APKINDEX.tar.gz
+(1/4) Installing ncurses-terminfo-base (6.4_p20240420-r2)
+(2/4) Installing libncursesw (6.4_p20240420-r2)
+(3/4) Installing readline (8.2.10-r0)
+(4/4) Installing bash (5.2.26-r0)
+Executing bash-5.2.26-r0.post-install
+Executing busybox-1.36.1-r29.trigger
+OK: 15 MiB in 22 packages
+Removing intermediate container b2be5d0db51a
+ ---> 8d23edea1de6
+Step 6/7 : COPY index.html /usr/share/nginx/html
+ ---> b046dfd944bd
+Step 7/7 : EXPOSE 8096
+ ---> Running in dbc7ef2c22d9
+Removing intermediate container dbc7ef2c22d9
+ ---> 86d6af597db4
+Successfully built 86d6af597db4
+Successfully tagged kunal3237/imageswithrunexpose:latest
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# cat Dockerfile
+ARG NGINX_VERSION=1.26
+FROM nginx:${NGINX_VERSION}-alpine-slim
+
+LABEL Author: Kunal Sharma
+LABEL Creation Date: Jan 20, 2025
+RUN apk --no-cache add bash
+
+COPY index.html /usr/share/nginx/html
+
+EXPOSE 8096
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+
+###########################################################
+
+root@kunal-Lenovo-U410:/home/kunal# docker run -d -p 8091:8096 --name myapp kunal3237/imageswithrunexpose
+07d2604e56dabc42fe324eb7403e9a517bf1c26ac9968191f725b03934b2c7e3
+root@kunal-Lenovo-U410:/home/kunal# docker ps
+CONTAINER ID   IMAGE                           COMMAND                  CREATED          STATUS          PORTS                                               NAMES
+07d2604e56da   kunal3237/imageswithrunexpose   "/docker-entrypoint.…"   16 seconds ago   Up 10 seconds   80/tcp, 0.0.0.0:8091->8096/tcp, :::8091->8096/tcp   myapp
+0fc484d9bd09   kindest/node:v1.28.0            "/usr/local/bin/entr…"   5 weeks ago      Up 5 hours                                                          kind-worker3
+14d475883ba7   kindest/node:v1.28.0            "/usr/local/bin/entr…"   5 weeks ago      Up 5 hours                                                          kind-worker2
+b0ede2a1a2bb   kindest/node:v1.28.0            "/usr/local/bin/entr…"   5 weeks ago      Up 5 hours      127.0.0.1:36811->6443/tcp                           kind-control-plane
+80829f8b2dec   kindest/node:v1.28.0            "/usr/local/bin/entr…"   5 weeks ago      Up 5 hours                                                          kind-worker
+
+root@kunal-Lenovo-U410:/home/kunal# docker inspect 07d2604e56da --format='{{json .Config.ExposedPorts}}' | jq
+{
+  "80/tcp": {},
+  "8096/tcp": {}                                                                        ##################Exposed port of the container
+}
+root@kunal-Lenovo-U410:/home/kunal# 
+
