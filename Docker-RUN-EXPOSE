@@ -85,3 +85,14 @@ root@kunal-Lenovo-U410:/home/kunal# docker inspect 07d2604e56da --format='{{json
 }
 root@kunal-Lenovo-U410:/home/kunal# 
 
+root@kunal-Lenovo-U410:/home/kunal# docker exec -it 07d2604e56da bash
+07d2604e56da:/# ps
+PID   USER     TIME  COMMAND
+    1 root      0:00 nginx: master process nginx -g daemon off;
+   30 nginx     0:00 nginx: worker process
+   31 nginx     0:00 nginx: worker process
+   32 nginx     0:00 nginx: worker process
+   33 nginx     0:00 nginx: worker process
+   34 root      0:00 bash
+   39 root      0:00 ps
+07d2604e56da:/# 
