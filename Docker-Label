@@ -165,3 +165,116 @@ hello-world                     latest           d2c94e258dcb   20 months ago   
 oracle/database                 19.3.0-ee        0291ee4fa2ff   2 years ago          6.54GB
 oraclelinux                     7-slim           b6816fd9cf33   2 years ago          135MB
 root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker push kunal3237/imagewithlabel:1.0.0
+The push refers to repository [docker.io/kunal3237/imagewithlabel]
+bf605f1537a3: Preparing 
+bf605f1537a3: Pushed 
+23625999797d: Mounted from library/nginx 
+9aa22afcf27f: Mounted from library/nginx 
+59a5cb944b91: Mounted from library/nginx 
+598e577f3a23: Mounted from library/nginx 
+fd5f65a144ef: Mounted from library/nginx 
+a8903c9578e9: Mounted from library/nginx 
+ce5a8cde9eee: Mounted from library/nginx 
+1.0.0: digest: sha256:bf0e9f95b191ec009ce55adc83c5208c9a2235189f685cd40ca2cc4fdf18b45c size: 1983
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+
+###############################Inspecting the Image to check the labels ##########################
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker image inspect kunal3237/imagewithlabel:1.0.0 | grep -iA5 label
+            "kunal3237/imagewithlabel:1.0.0"
+        ],
+        "RepoDigests": [
+            "kunal3237/imagewithlabel@sha256:bf0e9f95b191ec009ce55adc83c5208c9a2235189f685cd40ca2cc4fdf18b45c"
+        ],
+        "Parent": "sha256:d6359cf882ef4ca7181ba8b2004c0a648c12d39c35ed5cd585e9fca8575cc5dc",
+        "Comment": "",
+        "Created": "2025-01-19T14:13:58.119907001Z",
+        "Container": "",
+--
+            "Labels": {
+                "Author:": "Kunal Sharma",
+                "Description": ": Creating images with lables",
+                "Version:": "1.0.0",
+                "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>",
+                "org.opencontainers.image.authors": ": Kunal Sharma",
+--
+            "Labels": {
+                "Author:": "Kunal Sharma",
+                "Description": ": Creating images with lables",
+                "Version:": "1.0.0",
+                "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>",
+                "org.opencontainers.image.authors": ": Kunal Sharma",
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+#####################################################################
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker inspect kunal3237/imagewithlabel:1.0.0 | grep -iA5 label
+            "kunal3237/imagewithlabel:1.0.0"
+        ],
+        "RepoDigests": [
+            "kunal3237/imagewithlabel@sha256:bf0e9f95b191ec009ce55adc83c5208c9a2235189f685cd40ca2cc4fdf18b45c"
+        ],
+        "Parent": "sha256:d6359cf882ef4ca7181ba8b2004c0a648c12d39c35ed5cd585e9fca8575cc5dc",
+        "Comment": "",
+        "Created": "2025-01-19T14:13:58.119907001Z",
+        "Container": "",
+--
+            "Labels": {
+                "Author:": "Kunal Sharma",
+                "Description": ": Creating images with lables",
+                "Version:": "1.0.0",
+                "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>",
+                "org.opencontainers.image.authors": ": Kunal Sharma",
+--
+            "Labels": {
+                "Author:": "Kunal Sharma",
+                "Description": ": Creating images with lables",
+                "Version:": "1.0.0",
+                "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>",
+                "org.opencontainers.image.authors": ": Kunal Sharma",
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+################################Using filer and Jq################################
+
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker inspect kunal3237/imagewithlabel:1.0.0 --format='{{json .Config.Labels }}' | jq
+{
+  "Author:": "Kunal Sharma",
+  "Description": ": Creating images with lables",
+  "Version:": "1.0.0",
+  "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>",
+  "org.opencontainers.image.authors": ": Kunal Sharma",
+  "org.opencontainers.image.created": ": Jan 19 2025"
+}
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker inspect ubuntu --format='{{json .Config.Labels}}' | jq
+{
+  "org.opencontainers.image.ref.name": "ubuntu",
+  "org.opencontainers.image.version": "24.04"
+}
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+
+###################Details about running container############################
+root@kunal-Lenovo-U410:/home/kunal# docker inspect 56e0903fe892 --format='{{json .NetworkSettings.Networks.bridge}}' |jq  ########Use json to get the data in json format
+{
+  "IPAMConfig": null,
+  "Links": null,
+  "Aliases": null,
+  "NetworkID": "8d33c7f0e8380360d0f72232016bfee61d24751477d371d6a3c5d70a23416070",
+  "EndpointID": "54bfe73eeea2214c96ca30efaf47395454626ce4f5f514529509f565f8da20c0",
+  "Gateway": "172.17.0.1",
+  "IPAddress": "172.17.0.2",
+  "IPPrefixLen": 16,
+  "IPv6Gateway": "",
+  "GlobalIPv6Address": "",
+  "GlobalIPv6PrefixLen": 0,
+  "MacAddress": "02:42:ac:11:00:02",
+  "DriverOpts": null
+}
+root@kunal-Lenovo-U410:/home/kunal# 
+
+
