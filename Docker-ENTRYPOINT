@@ -1,5 +1,6 @@
 ################Use ENTRYPOINT when you want to define a container with a specific executable.
 Use CMD to provide default arguments to the ENTRYPOINT.
+CMD can be repplaced on run time, However --entrypoint needs to be provided if entrypoint commands need to updated
 
 
 ########################Using ENTRYPOINT######################
@@ -71,4 +72,40 @@ root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker run --name  m
 invalid argument "echo \"Hello there\"" for "-c, --cpu-shares" flag: strconv.ParseInt: parsing "echo \"Hello there\"": invalid syntax
 See 'docker run --help'.
 root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+######################Using Entrypoint AND CMD together########################
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker build -t kunal3237/imagewithentrypoint .
+Sending build context to Docker daemon  17.41kB
+Step 1/4 : FROM ubuntu
+ ---> b1d9df8ab815
+Step 2/4 : LABEL Author: Kunal Sharma
+ ---> Running in dfc09f3a3556
+Removing intermediate container dfc09f3a3556
+ ---> c8f4922f6b5e
+Step 3/4 : ENTRYPOINT ["echo" ,"kunal"]
+ ---> Running in c06e0951dd63
+Removing intermediate container c06e0951dd63
+ ---> 70db1a69c2d8
+Step 4/4 : CMD ["SHARMA"]
+ ---> Running in 016be6491257
+Removing intermediate container 016be6491257
+ ---> 273a5f8c5610
+Successfully built 273a5f8c5610
+Successfully tagged kunal3237/imagewithentrypoint:latest
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker run --name  myapp   kunal3237/imagewithentrypoint 
+kunal SHARMA
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# cat Dockerfile
+FROM ubuntu
+
+LABEL Author: Kunal Sharma
+
+ENTRYPOINT ["echo" ,"kunal"]                           ################Entrypoint
+CMD ["SHARMA"]                                         #####CMD, It is used as an argument by entrypoint when used together
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+
+########################################
+Use CMD: When you want to provide default behavior but allow users to override it easily (e.g., running a script or command with defaults).
+Use ENTRYPOINT: When you want the container to always execute a specific application or script (e.g., a web server or database).
 
