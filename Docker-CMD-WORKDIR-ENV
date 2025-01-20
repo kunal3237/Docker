@@ -421,6 +421,8 @@ Removing intermediate container 1cecdc78e0ea
  ---> 15a1d3628758
 Successfully built 15a1d3628758
 Successfully tagged kunal3237/imagewithcmd:latest
+
+###################Overriding CMD ##################################
 root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker run --name myapp -it kunal3237/imagewithcmd sh
 / # ls
 bin                   docker-entrypoint.sh  lib                   opt                   run                   sys                   var
