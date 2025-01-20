@@ -13,7 +13,7 @@ RUN apk --no-cache add bash                                                  ###
 
 COPY index.html /usr/share/nginx/html
 
-EXPOSE 8096                                                                  ########Exposing th container on port 8096 of the host
+EXPOSE 8096                                                                  ########Does not actually map the port to the host machine or make it accessible externally. It for Documentaion pupose
 root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
 
 ###############################################################
@@ -68,7 +68,7 @@ root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice#
 
 ###########################################################
 
-root@kunal-Lenovo-U410:/home/kunal# docker run -d -p 8091:8096 --name myapp kunal3237/imageswithrunexpose
+root@kunal-Lenovo-U410:/home/kunal# docker run -d -p 8091:8096 --name myapp kunal3237/imageswithrunexpose                  ######-P actually maps the port
 07d2604e56dabc42fe324eb7403e9a517bf1c26ac9968191f725b03934b2c7e3
 root@kunal-Lenovo-U410:/home/kunal# docker ps
 CONTAINER ID   IMAGE                           COMMAND                  CREATED          STATUS          PORTS                                               NAMES
