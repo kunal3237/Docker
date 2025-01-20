@@ -1,0 +1,98 @@
+#######ARG is used to add build time variables  #####
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# cat Dockerfile
+ARG NGINX_VERSION=1.26                                                            ##########Defining ARG
+FROM nginx:${NGINX_VERSION}-alpine-slim
+
+LABEL Author: Kunal Sharma
+LABEL Creation Date: Jan 20, 2025
+
+COPY index.html /usr/share/nginx/html
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker build -t kunal3237/imagewitharg .
+Sending build context to Docker daemon   12.8kB
+Step 1/5 : ARG NGINX_VERSION=1.26
+Step 2/5 : FROM nginx:${NGINX_VERSION}-alpine-slim
+1.26-alpine-slim: Pulling from library/nginx
+66a3d608f3fa: Already exists 
+425c7b6b0584: Pull complete 
+bc3151b8c483: Pull complete 
+32c1c5ad4705: Pull complete 
+acc3b7ea73b8: Pull complete 
+b527c1980d34: Pull complete 
+ea697fe9913f: Pull complete 
+Digest: sha256:1d541dc68a99c4da7923e88b8e184f85034804a1ff59ee838a81d83c319267d8
+Status: Downloaded newer image for nginx:1.26-alpine-slim
+ ---> 008f853bbf53
+Step 3/5 : LABEL Author: Kunal Sharma
+ ---> Running in f51c368e9233
+Removing intermediate container f51c368e9233
+ ---> f10c92711693
+Step 4/5 : LABEL Creation Date: Jan 20, 2025
+ ---> Running in 2f3571b4e844
+Removing intermediate container 2f3571b4e844
+ ---> 6a40a7f9e789
+Step 5/5 : COPY index.html /usr/share/nginx/html
+ ---> fb78903859d7
+Successfully built fb78903859d7
+Successfully tagged kunal3237/imagewitharg:latest
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker run -d -p 8056:80 --name myapp kunal3237/imagewitharg
+936e23ff0fa79f375f4a367e207cac22e366900e975d68ab3593dbb251cb55ab
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker ps 
+CONTAINER ID   IMAGE                    COMMAND                  CREATED          STATUS          PORTS                                   NAMES
+936e23ff0fa7   kunal3237/imagewitharg   "/docker-entrypoint.…"   55 seconds ago   Up 48 seconds   0.0.0.0:8056->80/tcp, :::8056->80/tcp   myapp
+0fc484d9bd09   kindest/node:v1.28.0     "/usr/local/bin/entr…"   5 weeks ago      Up 4 hours                                              kind-worker3
+14d475883ba7   kindest/node:v1.28.0     "/usr/local/bin/entr…"   5 weeks ago      Up 4 hours                                              kind-worker2
+b0ede2a1a2bb   kindest/node:v1.28.0     "/usr/local/bin/entr…"   5 weeks ago      Up 4 hours      127.0.0.1:36811->6443/tcp               kind-control-plane
+80829f8b2dec   kindest/node:v1.28.0     "/usr/local/bin/entr…"   5 weeks ago      Up 4 hours                                              kind-worker
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker exec -it 936e23ff0fa7 sh
+/ # ls
+bin                   docker-entrypoint.sh  lib                   opt                   run                   sys                   var
+dev                   etc                   media                 proc                  sbin                  tmp
+docker-entrypoint.d   home                  mnt                   root                  srv                   usr
+/ # nginx -v                                                                                              ##########Version Check
+nginx version: nginx/1.26.2                                                              
+/ # 
+
+##################################Overriding with command line built time variable #########################
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker build --build-arg NGINX_VERSION=1.27 -t kunal3237/imagewithcommandarg .
+Sending build context to Docker daemon   12.8kB
+Step 1/5 : ARG NGINX_VERSION=1.26
+Step 2/5 : FROM nginx:${NGINX_VERSION}-alpine-slim
+1.27-alpine-slim: Pulling from library/nginx
+Digest: sha256:5a56ae385906c5b43ccc99379bce883aa93dc0556d7f705ba501d819925e8fa1
+Status: Downloaded newer image for nginx:1.27-alpine-slim
+ ---> 9765c8de364c
+Step 3/5 : LABEL Author: Kunal Sharma
+ ---> Running in eb1123115d4a
+Removing intermediate container eb1123115d4a
+ ---> 2f13c7c99fe6
+Step 4/5 : LABEL Creation Date: Jan 20, 2025
+ ---> Running in 9585105fb037
+Removing intermediate container 9585105fb037
+ ---> fe644780abde
+Step 5/5 : COPY index.html /usr/share/nginx/html
+ ---> 0d8cb3cb42cb
+Successfully built 0d8cb3cb42cb
+Successfully tagged kunal3237/imagewithcommandarg:latest
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker run --name myapp -p 8056:80 -d kunal3237/imagewithcommandarg                        #####Passing command line build build arg
+3bd691d3771ba3fc3a3566742898228bc50bdb8b67374d09b59206d7adceaa32
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker ps 
+CONTAINER ID   IMAGE                           COMMAND                  CREATED          STATUS         PORTS                                   NAMES
+3bd691d3771b   kunal3237/imagewithcommandarg   "/docker-entrypoint.…"   10 seconds ago   Up 5 seconds   0.0.0.0:8056->80/tcp, :::8056->80/tcp   myapp
+0fc484d9bd09   kindest/node:v1.28.0            "/usr/local/bin/entr…"   5 weeks ago      Up 4 hours                                             kind-worker3
+14d475883ba7   kindest/node:v1.28.0            "/usr/local/bin/entr…"   5 weeks ago      Up 4 hours                                             kind-worker2
+b0ede2a1a2bb   kindest/node:v1.28.0            "/usr/local/bin/entr…"   5 weeks ago      Up 4 hours     127.0.0.1:36811->6443/tcp               kind-control-plane
+80829f8b2dec   kindest/node:v1.28.0            "/usr/local/bin/entr…"   5 weeks ago      Up 4 hours                                             kind-worker
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker exec -it 3bd691d3771b nginx -v
+nginx version: nginx/1.27.3
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+
