@@ -1,0 +1,165 @@
+#######################Testing with Volumes #########################
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker volume ls
+DRIVER    VOLUME NAME
+local     1a51a916130d95e834b8beedfd5258e914633176d5323dd1c2ac303f3b5a8ca9
+local     7476f461feb1b683daba673afaf2d8dde2519db8c1f1bc572ee1e31d90980aa7
+local     cdb78a5e4ce6ab443781652753d83b339010b71f43ac30086a720268052a3a3d
+local     fa361a1f7f7d4ce562932b65c7e20ef22a47a8a505c87573fc74695a5ed86d00
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker inspect 0fc484d9bd09 --format='{{json .Mounts}}' | jq
+[
+  {
+    "Type": "bind",
+    "Source": "/lib/modules",
+    "Destination": "/lib/modules",
+    "Mode": "ro",
+    "RW": false,
+    "Propagation": "rprivate"
+  },
+  {
+    "Type": "volume",
+    "Name": "1a51a916130d95e834b8beedfd5258e914633176d5323dd1c2ac303f3b5a8ca9",
+    "Source": "/var/lib/docker/volumes/1a51a916130d95e834b8beedfd5258e914633176d5323dd1c2ac303f3b5a8ca9/_data",
+    "Destination": "/var",
+    "Driver": "local",
+    "Mode": "",
+    "RW": true,
+    "Propagation": ""
+  }
+]
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+###########################Creating Docker volume#########################
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker volume create my-vol
+my-vol
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker volume ls
+DRIVER    VOLUME NAME
+local     1a51a916130d95e834b8beedfd5258e914633176d5323dd1c2ac303f3b5a8ca9
+local     7476f461feb1b683daba673afaf2d8dde2519db8c1f1bc572ee1e31d90980aa7
+local     cdb78a5e4ce6ab443781652753d83b339010b71f43ac30086a720268052a3a3d
+local     fa361a1f7f7d4ce562932b65c7e20ef22a47a8a505c87573fc74695a5ed86d00
+local     my-vol
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker volume inspect my-vol
+[
+    {
+        "CreatedAt": "2025-01-21T14:31:52+05:30",
+        "Driver": "local",
+        "Labels": {},
+        "Mountpoint": "/var/lib/docker/volumes/my-vol/_data",
+        "Name": "my-vol",
+        "Options": {},
+        "Scope": "local"
+    }
+]
+
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker volume inspect 1a51a916130d95e834b8beedfd5258e914633176d5323dd1c2ac303f3b5a8ca9
+[
+    {
+        "CreatedAt": "2024-12-15T17:05:52+05:30",
+        "Driver": "local",
+        "Labels": null,
+        "Mountpoint": "/var/lib/docker/volumes/1a51a916130d95e834b8beedfd5258e914633176d5323dd1c2ac303f3b5a8ca9/_data",
+        "Name": "1a51a916130d95e834b8beedfd5258e914633176d5323dd1c2ac303f3b5a8ca9",
+        "Options": null,
+        "Scope": "local"
+    }
+]
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# ls -ltr /var/lib/docker/volumes/1a51a916130d95e834b8beedfd5258e914633176d5323dd1c2ac303f3b5a8ca9/_data
+total 36
+drwxrwxrwt  2 root root  4096 Apr  2  2023 tmp
+drwxrwsr-x  2 root staff 4096 Apr  2  2023 local
+drwxr-xr-x  2 root root  4096 Apr  2  2023 backups
+lrwxrwxrwx  1 root root     4 May 22  2023 run -> /run
+drwxr-xr-x  2 root root  4096 May 22  2023 opt
+drwxrwsr-x  2 root mail  4096 May 22  2023 mail
+lrwxrwxrwx  1 root root     9 May 22  2023 lock -> /run/lock
+drwxr-xr-x  5 root root  4096 Dec 15 17:04 cache
+drwxr-xr-x  2 root root  4096 Dec 15 17:05 spool
+drwxr-xr-x  4 root root  4096 Dec 15 17:08 log
+drwxr-xr-x 13 root root  4096 Dec 15 17:18 lib
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+###########################Anonymous ###############################
+Anonymous volumes are often created implicitly when  VOLUME instruction in a Dockerfile without specifying a name.
+
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker volume create
+ec2b1bef098f4894338e5573af6b08ca2163b49cf9ada0c3184663b46cadda8a
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker volume ls
+DRIVER    VOLUME NAME
+local     1a51a916130d95e834b8beedfd5258e914633176d5323dd1c2ac303f3b5a8ca9
+local     7476f461feb1b683daba673afaf2d8dde2519db8c1f1bc572ee1e31d90980aa7
+local     cdb78a5e4ce6ab443781652753d83b339010b71f43ac30086a720268052a3a3d
+local     ec2b1bef098f4894338e5573af6b08ca2163b49cf9ada0c3184663b46cadda8a
+local     fa361a1f7f7d4ce562932b65c7e20ef22a47a8a505c87573fc74695a5ed86d00
+local     my-vol
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker volume inspect ec2b1bef098f4894338e5573af6b08ca2163b49cf9ada0c3184663b46cadda8a
+[
+    {
+        "CreatedAt": "2025-01-21T14:35:04+05:30",
+        "Driver": "local",
+        "Labels": {},
+        "Mountpoint": "/var/lib/docker/volumes/ec2b1bef098f4894338e5573af6b08ca2163b49cf9ada0c3184663b46cadda8a/_data",
+        "Name": "ec2b1bef098f4894338e5573af6b08ca2163b49cf9ada0c3184663b46cadda8a",
+        "Options": {},
+        "Scope": "local"
+    }
+]
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+################################Prune to remove volumes not used by any container#####################
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker volume ls
+DRIVER    VOLUME NAME
+local     1a51a916130d95e834b8beedfd5258e914633176d5323dd1c2ac303f3b5a8ca9
+local     7476f461feb1b683daba673afaf2d8dde2519db8c1f1bc572ee1e31d90980aa7
+local     cdb78a5e4ce6ab443781652753d83b339010b71f43ac30086a720268052a3a3d
+local     ec2b1bef098f4894338e5573af6b08ca2163b49cf9ada0c3184663b46cadda8a
+local     fa361a1f7f7d4ce562932b65c7e20ef22a47a8a505c87573fc74695a5ed86d00
+local     my-vol
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker volume prune
+WARNING! This will remove all local volumes not used by at least one container.
+Are you sure you want to continue? [y/N] y
+Deleted Volumes:
+my-vol
+ec2b1bef098f4894338e5573af6b08ca2163b49cf9ada0c3184663b46cadda8a
+
+Total reclaimed space: 0B
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker volume ls
+DRIVER    VOLUME NAME
+local     1a51a916130d95e834b8beedfd5258e914633176d5323dd1c2ac303f3b5a8ca9
+local     7476f461feb1b683daba673afaf2d8dde2519db8c1f1bc572ee1e31d90980aa7
+local     cdb78a5e4ce6ab443781652753d83b339010b71f43ac30086a720268052a3a3d
+local     fa361a1f7f7d4ce562932b65c7e20ef22a47a8a505c87573fc74695a5ed86d00
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+####################################################################################
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker volume ls
+DRIVER    VOLUME NAME
+local     1a51a916130d95e834b8beedfd5258e914633176d5323dd1c2ac303f3b5a8ca9
+local     7476f461feb1b683daba673afaf2d8dde2519db8c1f1bc572ee1e31d90980aa7
+local     cdb78a5e4ce6ab443781652753d83b339010b71f43ac30086a720268052a3a3d
+local     fa361a1f7f7d4ce562932b65c7e20ef22a47a8a505c87573fc74695a5ed86d00
+local     my-vol
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker volume rm my-vol
+my-vol
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker volume ls
+DRIVER    VOLUME NAME
+local     1a51a916130d95e834b8beedfd5258e914633176d5323dd1c2ac303f3b5a8ca9
+local     7476f461feb1b683daba673afaf2d8dde2519db8c1f1bc572ee1e31d90980aa7
+local     cdb78a5e4ce6ab443781652753d83b339010b71f43ac30086a720268052a3a3d
+local     fa361a1f7f7d4ce562932b65c7e20ef22a47a8a505c87573fc74695a5ed86d00
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+
+###########################################Can't remove volumes that are in use ###################################
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker volume rm 1a51a916130d95e834b8beedfd5258e914633176d5323dd1c2ac303f3b5a8ca9
+Error response from daemon: remove 1a51a916130d95e834b8beedfd5258e914633176d5323dd1c2ac303f3b5a8ca9: volume is in use - [0fc484d9bd09b837bd69b0c4fa63fd555d3bc6ee52ce2f3287583c837cee1cc4]
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
