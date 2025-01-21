@@ -1,0 +1,218 @@
+##############Test USER instruction  ########################
+Normally when we run container, containers are run with root unless specified to run as other user. We will test the working here
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker build -t kunal3237/imagewithuser .
+Sending build context to Docker daemon   21.5kB
+Step 1/10 : FROM python:3.14.0a4-alpine3.21
+ ---> aa236fd83469
+Step 2/10 : LABEL Author : Kunal Sharma
+ ---> Using cache
+ ---> e92e0abb0de5
+Step 3/10 : LABEL Created : 21 Jan,2025
+ ---> Using cache
+ ---> 1ecceac9770a
+Step 4/10 : LABEL Description : To Check HealthCheck working
+ ---> Using cache
+ ---> 1003f47e76be
+Step 5/10 : RUN apk add bash curl
+ ---> Using cache
+ ---> 0d777cabacab
+Step 6/10 : COPY requirement.txt requirement.txt
+ ---> be1b75448933
+Step 7/10 : RUN pip3 install -r requirement.txt
+ ---> Running in 43b05c6de890
+Collecting requests (from -r requirement.txt (line 1))
+  Downloading requests-2.32.3-py3-none-any.whl.metadata (4.6 kB)
+Collecting charset-normalizer<4,>=2 (from requests->-r requirement.txt (line 1))
+  Downloading charset_normalizer-3.4.1-py3-none-any.whl.metadata (35 kB)
+Collecting idna<4,>=2.5 (from requests->-r requirement.txt (line 1))
+  Downloading idna-3.10-py3-none-any.whl.metadata (10 kB)
+Collecting urllib3<3,>=1.21.1 (from requests->-r requirement.txt (line 1))
+  Downloading urllib3-2.3.0-py3-none-any.whl.metadata (6.5 kB)
+Collecting certifi>=2017.4.17 (from requests->-r requirement.txt (line 1))
+  Downloading certifi-2024.12.14-py3-none-any.whl.metadata (2.3 kB)
+Downloading requests-2.32.3-py3-none-any.whl (64 kB)
+Downloading certifi-2024.12.14-py3-none-any.whl (164 kB)
+Downloading charset_normalizer-3.4.1-py3-none-any.whl (49 kB)
+Downloading idna-3.10-py3-none-any.whl (70 kB)
+Downloading urllib3-2.3.0-py3-none-any.whl (128 kB)
+Installing collected packages: urllib3, idna, charset-normalizer, certifi, requests
+Successfully installed certifi-2024.12.14 charset-normalizer-3.4.1 idna-3.10 requests-2.32.3 urllib3-2.3.0
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable.It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+Removing intermediate container 43b05c6de890
+ ---> a1e07ad9a804
+Step 8/10 : WORKDIR /app
+ ---> Running in 540a3e957f24
+Removing intermediate container 540a3e957f24
+ ---> bd05b22420e4
+Step 9/10 : COPY api-json-data.py /app/api-json-data.py
+ ---> ed83113f8445
+Step 10/10 : ENTRYPOINT ["python3","api-json-data.py"]
+ ---> Running in a00dae2ab42e
+Removing intermediate container a00dae2ab42e
+ ---> 9896f868b680
+Successfully built 9896f868b680
+Successfully tagged kunal3237/imagewithuser:latest
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# cat Dockerfile
+FROM python:3.14.0a4-alpine3.21
+
+LABEL Author : Kunal Sharma
+LABEL Created : 21 Jan,2025
+LABEL Description : To Check HealthCheck working
+
+#RUN adduser -D -H -s /bin/bash -u 1001 kunal
+
+RUN apk add bash curl
+COPY requirement.txt requirement.txt
+RUN pip3 install -r requirement.txt
+WORKDIR /app
+#USER kunal
+#COPY index.html /usr/share/nginx/html
+COPY api-json-data.py /app/api-json-data.py
+#HEALTHCHECK --interval=60s --timeout=60s --start-period=60s  --retries=3 CMD curl -f http://localhost:8090 || exit 1
+
+ENTRYPOINT ["python3","api-json-data.py"]
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker run -d --name myapp kunal3237/imagewithuser
+95fb577a8311ebee6ca0761070234633c4fdfe15775b13a9a5752942bbfe974e
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker ps
+CONTAINER ID   IMAGE                     COMMAND                  CREATED         STATUS         PORTS                       NAMES
+95fb577a8311   kunal3237/imagewithuser   "python3 api-json-da…"   7 seconds ago   Up 2 seconds                               myapp
+0fc484d9bd09   kindest/node:v1.28.0      "/usr/local/bin/entr…"   5 weeks ago     Up 2 hours                                 kind-worker3
+14d475883ba7   kindest/node:v1.28.0      "/usr/local/bin/entr…"   5 weeks ago     Up 2 hours                                 kind-worker2
+b0ede2a1a2bb   kindest/node:v1.28.0      "/usr/local/bin/entr…"   5 weeks ago     Up 2 hours     127.0.0.1:36811->6443/tcp   kind-control-plane
+80829f8b2dec   kindest/node:v1.28.0      "/usr/local/bin/entr…"   5 weeks ago     Up 2 hours                                 kind-worker
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker exec -it myapp bash
+95fb577a8311:/app# ps -a
+PID   USER     TIME  COMMAND
+    1 root      0:00 python3 api-json-data.py                                                                #####Process runing with root
+    7 root      0:00 bash
+   13 root      0:00 ps -a
+95fb577a8311:/app# 
+
+
+##############################User user ###################################
+Deleted: sha256:26413aa63a1cde4875c885b40d9f58f49fd45fbc6591b24497536f5c68740527
+Deleted: sha256:a1e07ad9a804449b1a88d71cf4eb29a75843d944b90e0d0c98d644bca09d133b
+Deleted: sha256:8ac0fab40b8a64f05008a2d2d54e77782369b6e54830f98dcf880f13bff33f6c
+Deleted: sha256:be1b75448933ccb7837877f11822caaa6fed778e54dee0a1468f5cab0cfc4747
+Deleted: sha256:3b715f630039be14641076e33b3a41643ad9c24efeb968deeeb22464e0a40122
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# vi Dockerfile
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker build -t kunal3237/imagewithuser .
+Sending build context to Docker daemon   21.5kB
+Step 1/12 : FROM python:3.14.0a4-alpine3.21
+ ---> aa236fd83469
+Step 2/12 : LABEL Author : Kunal Sharma
+ ---> Using cache
+ ---> e92e0abb0de5
+Step 3/12 : LABEL Created : 21 Jan,2025
+ ---> Using cache
+ ---> 1ecceac9770a
+Step 4/12 : LABEL Description : To Check HealthCheck working
+ ---> Using cache
+ ---> 1003f47e76be
+Step 5/12 : RUN adduser -D -H -s /bin/bash -u 1001 kunal
+ ---> Running in e57dd31800a9
+Removing intermediate container e57dd31800a9
+ ---> 53b8c27a5272
+Step 6/12 : RUN apk add bash curl
+ ---> Running in 8fbc7f23f100
+fetch https://dl-cdn.alpinelinux.org/alpine/v3.21/main/x86_64/APKINDEX.tar.gz
+fetch https://dl-cdn.alpinelinux.org/alpine/v3.21/community/x86_64/APKINDEX.tar.gz
+(1/10) Installing bash (5.2.37-r0)
+Executing bash-5.2.37-r0.post-install
+(2/10) Installing brotli-libs (1.1.0-r2)
+(3/10) Installing c-ares (1.34.3-r0)
+(4/10) Installing libunistring (1.2-r0)
+(5/10) Installing libidn2 (2.3.7-r0)
+(6/10) Installing nghttp2-libs (1.64.0-r0)
+(7/10) Installing libpsl (0.21.5-r3)
+(8/10) Installing zstd-libs (1.5.6-r2)
+(9/10) Installing libcurl (8.11.1-r0)
+(10/10) Installing curl (8.11.1-r0)
+Executing busybox-1.37.0-r9.trigger
+OK: 16 MiB in 38 packages
+Removing intermediate container 8fbc7f23f100
+ ---> f8ea8a6b5c83
+Step 7/12 : COPY requirement.txt requirement.txt
+ ---> f2795e5e99e7
+Step 8/12 : RUN pip3 install -r requirement.txt
+ ---> Running in 7f32ed769a0c
+Collecting requests (from -r requirement.txt (line 1))
+  Downloading requests-2.32.3-py3-none-any.whl.metadata (4.6 kB)
+Collecting charset-normalizer<4,>=2 (from requests->-r requirement.txt (line 1))
+  Downloading charset_normalizer-3.4.1-py3-none-any.whl.metadata (35 kB)
+Collecting idna<4,>=2.5 (from requests->-r requirement.txt (line 1))
+  Downloading idna-3.10-py3-none-any.whl.metadata (10 kB)
+Collecting urllib3<3,>=1.21.1 (from requests->-r requirement.txt (line 1))
+  Downloading urllib3-2.3.0-py3-none-any.whl.metadata (6.5 kB)
+Collecting certifi>=2017.4.17 (from requests->-r requirement.txt (line 1))
+  Downloading certifi-2024.12.14-py3-none-any.whl.metadata (2.3 kB)
+Downloading requests-2.32.3-py3-none-any.whl (64 kB)
+Downloading certifi-2024.12.14-py3-none-any.whl (164 kB)
+Downloading charset_normalizer-3.4.1-py3-none-any.whl (49 kB)
+Downloading idna-3.10-py3-none-any.whl (70 kB)
+Downloading urllib3-2.3.0-py3-none-any.whl (128 kB)
+Installing collected packages: urllib3, idna, charset-normalizer, certifi, requests
+Successfully installed certifi-2024.12.14 charset-normalizer-3.4.1 idna-3.10 requests-2.32.3 urllib3-2.3.0
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable.It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+Removing intermediate container 7f32ed769a0c
+ ---> cdb52ab4177b
+Step 9/12 : WORKDIR /app
+ ---> Running in f5a118c7cbd8
+Removing intermediate container f5a118c7cbd8
+ ---> e2191eaf8661
+Step 10/12 : USER kunal
+ ---> Running in 34dc15bc9317
+Removing intermediate container 34dc15bc9317
+ ---> fe13e94518a3
+Step 11/12 : COPY api-json-data.py /app/api-json-data.py
+ ---> 4e5f5e294d33
+Step 12/12 : ENTRYPOINT ["python3","api-json-data.py"]
+ ---> Running in ebc3f571c28b
+Removing intermediate container ebc3f571c28b
+ ---> d04d889c7c34
+Successfully built d04d889c7c34
+Successfully tagged kunal3237/imagewithuser:latest
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# cat Dockerfile
+FROM python:3.14.0a4-alpine3.21
+
+LABEL Author : Kunal Sharma
+LABEL Created : 21 Jan,2025
+LABEL Description : To Check HealthCheck working
+
+RUN adduser -D -H -s /bin/bash -u 1001 kunal
+
+RUN apk add bash curl
+COPY requirement.txt requirement.txt
+RUN pip3 install -r requirement.txt
+WORKDIR /app
+USER kunal                                                                            ####Defining USER
+#COPY index.html /usr/share/nginx/html
+COPY api-json-data.py /app/api-json-data.py
+#HEALTHCHECK --interval=60s --timeout=60s --start-period=60s  --retries=3 CMD curl -f http://localhost:8090 || exit 1
+
+ENTRYPOINT ["python3","api-json-data.py"]
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker run -d --name myapp kunal3237/imagewithuser
+f3b0761f6af4c68fbbd3616dcdca84441e0fd6f3548d4ebffc9403e763da228a
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker exec -it myapp bash
+f3b0761f6af4:/app$ ps -a
+PID   USER     TIME  COMMAND
+    1 kunal     0:00 python3 api-json-data.py                                                      ####Script being run with USER kunal
+    7 kunal     0:00 bash
+   13 kunal     0:00 ps -a
+f3b0761f6af4:/app$ 
+
+
+f3b0761f6af4:/app$ whoami
+kunal
+f3b0761f6af4:/app$ 
+
+#######################Connecting with root ###########################
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker exec -it --user root myapp bash
+f3b0761f6af4:/app# whoami
+root
+f3b0761f6af4:/app# 
+
