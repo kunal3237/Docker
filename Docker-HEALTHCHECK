@@ -1,1 +1,251 @@
+################Healthcheck###########################
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# cat Dockerfile
+FROM nginx:alpine-slim
+
+LABEL Author : Kunal Sharma
+LABEL Created : 21 Jan,2025
+LABEL Description : To Check HealthCheck working
+
+RUN apk add bash curl
+
+COPY index.html /usr/share/nginx/html
+
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s  --retries=3 CMD curl -f http://localhost/ || exit 1
+
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker build -t kunal3237/imagewithhealthcheck .
+Sending build context to Docker daemon  18.43kB
+Step 1/7 : FROM nginx:alpine-slim
+ ---> 9765c8de364c
+Step 2/7 : LABEL Author : Kunal Sharma
+ ---> Running in a4a76ae77aa9
+Removing intermediate container a4a76ae77aa9
+ ---> 1a0f92e94a24
+Step 3/7 : LABEL Created : 21 Jan,2025
+ ---> Running in db17dd679877
+Removing intermediate container db17dd679877
+ ---> bd6729d0d80e
+Step 4/7 : LABEL Description : To Check HealthCheck working
+ ---> Running in 83bfaa721caa
+Removing intermediate container 83bfaa721caa
+ ---> 7866c0865ffd
+Step 5/7 : RUN apk add bash curl
+ ---> Running in f9b92cf67515
+fetch https://dl-cdn.alpinelinux.org/alpine/v3.20/main/x86_64/APKINDEX.tar.gz
+fetch https://dl-cdn.alpinelinux.org/alpine/v3.20/community/x86_64/APKINDEX.tar.gz
+(1/14) Installing ncurses-terminfo-base (6.4_p20240420-r2)
+(2/14) Installing libncursesw (6.4_p20240420-r2)
+(3/14) Installing readline (8.2.10-r0)
+(4/14) Installing bash (5.2.26-r0)
+Executing bash-5.2.26-r0.post-install
+(5/14) Installing ca-certificates (20241121-r1)
+(6/14) Installing brotli-libs (1.1.0-r2)
+(7/14) Installing c-ares (1.33.1-r0)
+(8/14) Installing libunistring (1.2-r0)
+(9/14) Installing libidn2 (2.3.7-r0)
+(10/14) Installing nghttp2-libs (1.62.1-r0)
+(11/14) Installing libpsl (0.21.5-r1)
+(12/14) Installing zstd-libs (1.5.6-r0)
+(13/14) Installing libcurl (8.11.1-r0)
+(14/14) Installing curl (8.11.1-r0)
+Executing busybox-1.36.1-r29.trigger
+Executing ca-certificates-20241121-r1.trigger
+OK: 20 MiB in 32 packages
+Removing intermediate container f9b92cf67515
+ ---> 0015d5e9614b
+Step 6/7 : COPY index.html /usr/share/nginx/html
+ ---> 92f6f11d4edd
+Step 7/7 : HEALTHCHECK --interval=30s --timeout=30s --start-period=5s  --retries=3 CMD curl -f http://localhost/ || exit 1
+ ---> Running in 04d6a1c9fea6
+Removing intermediate container 04d6a1c9fea6
+ ---> d084bec04f17
+Successfully built d084bec04f17
+Successfully tagged kunal3237/imagewithhealthcheck:latest
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+
+########################################
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker run -d -p 8081:80 --name myapp kunal3237/imagewithhealthcheck 
+f622654ef3f8892210b2b0543fdd2e5ae2c13af0ce229cd31b19107d3be12fa8
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker ps
+CONTAINER ID   IMAGE                            COMMAND                  CREATED         STATUS                            PORTS                                   NAMES
+f622654ef3f8   kunal3237/imagewithhealthcheck   "/docker-entrypoint.…"   8 seconds ago   Up 3 seconds (health: starting)   0.0.0.0:8081->80/tcp, :::8081->80/tcp   myapp
+0fc484d9bd09   kindest/node:v1.28.0             "/usr/local/bin/entr…"   5 weeks ago     Up 40 minutes                                                             kind-worker3
+14d475883ba7   kindest/node:v1.28.0             "/usr/local/bin/entr…"   5 weeks ago     Up 40 minutes                                                             kind-worker2
+b0ede2a1a2bb   kindest/node:v1.28.0             "/usr/local/bin/entr…"   5 weeks ago     Up 40 minutes                     127.0.0.1:36811->6443/tcp               kind-control-plane
+80829f8b2dec   kindest/node:v1.28.0             "/usr/local/bin/entr…"   5 weeks ago     Up 40 minutes                                                             kind-worker
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+
+###########################
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker image inspect kunal3237/imagewithhealthcheck --format='{{json .ContainerConfig.Healthcheck}}' | jq
+{
+  "Test": [
+    "CMD-SHELL",
+    "curl -f http://localhost/ || exit 1"
+  ],
+  "Interval": 30000000000,
+  "Timeout": 30000000000,
+  "StartPeriod": 5000000000,
+  "Retries": 3
+}
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+#########################################################Image and Container have differnent property name so please inspect accordingly###############
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker inspect f622654ef3f8 --format='{{json .Config.Healthcheck}}' | jq
+{
+  "Test": [
+    "CMD-SHELL",
+    "curl -f http://localhost/ || exit 1"
+  ],
+  "Interval": 30000000000,
+  "Timeout": 30000000000,
+  "StartPeriod": 5000000000,
+  "Retries": 3
+}
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+  #################################Stoppng the nginx service, It stopped the container ############################################
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker exec -it f622654ef3f8 bash
+f622654ef3f8:/# ps -a
+PID   USER     TIME  COMMAND
+    1 root      0:00 nginx: master process nginx -g daemon off;
+  154 nginx     0:00 nginx: worker process
+  155 nginx     0:00 nginx: worker process
+  156 nginx     0:00 nginx: worker process
+  157 nginx     0:00 nginx: worker process
+  191 root      0:00 bash
+  197 root      0:00 ps -a
+f622654ef3f8:/#  nginx -s stop
+2025/01/21 05:23:38 [notice] 198#198: signal process started
+f622654ef3f8:/# root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker exec -it f622654ef3f8 bash
+Error response from daemon: Container f622654ef3f8892210b2b0543fdd2e5ae2c13af0ce229cd31b19107d3be12fa8 is not running
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker ps
+CONTAINER ID   IMAGE                  COMMAND                  CREATED       STATUS          PORTS                       NAMES
+0fc484d9bd09   kindest/node:v1.28.0   "/usr/local/bin/entr…"   5 weeks ago   Up 50 minutes                               kind-worker3
+14d475883ba7   kindest/node:v1.28.0   "/usr/local/bin/entr…"   5 weeks ago   Up 50 minutes                               kind-worker2
+b0ede2a1a2bb   kindest/node:v1.28.0   "/usr/local/bin/entr…"   5 weeks ago   Up 50 minutes   127.0.0.1:36811->6443/tcp   kind-control-plane
+80829f8b2dec   kindest/node:v1.28.0   "/usr/local/bin/entr…"   5 weeks ago   Up 50 minutes                               kind-worker
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+##########################################Testing with atest case ####################
+Runnig nginx server, default port 80, However configuring the healthcheck on 8090. Also increased the time to check healthcheck ################
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# cat Dockerfile
+FROM nginx:alpine-slim
+
+LABEL Author : Kunal Sharma
+LABEL Created : 21 Jan,2025
+LABEL Description : To Check HealthCheck working
+
+RUN apk add bash curl
+
+COPY index.html /usr/share/nginx/html
+
+HEALTHCHECK --interval=60s --timeout=60s --start-period=60s  --retries=3 CMD curl -f http://localhost:8090 || exit 1                    #####8090, port being checked and timing also increased
+
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker build -t kunal3237/imagewithhealthcheck .
+Sending build context to Docker daemon  18.43kB
+Step 1/7 : FROM nginx:alpine-slim
+ ---> 9765c8de364c
+Step 2/7 : LABEL Author : Kunal Sharma
+ ---> Running in dc40683509f6
+Removing intermediate container dc40683509f6
+ ---> 42be99c36c15
+Step 3/7 : LABEL Created : 21 Jan,2025
+ ---> Running in 98b71703dd55
+Removing intermediate container 98b71703dd55
+ ---> 13f9159d5a88
+Step 4/7 : LABEL Description : To Check HealthCheck working
+ ---> Running in 2e289d0675ea
+Removing intermediate container 2e289d0675ea
+ ---> 2ac96e0942e8
+Step 5/7 : RUN apk add bash curl
+ ---> Running in d971c1513da4
+fetch https://dl-cdn.alpinelinux.org/alpine/v3.20/main/x86_64/APKINDEX.tar.gz
+fetch https://dl-cdn.alpinelinux.org/alpine/v3.20/community/x86_64/APKINDEX.tar.gz
+(1/14) Installing ncurses-terminfo-base (6.4_p20240420-r2)
+(2/14) Installing libncursesw (6.4_p20240420-r2)
+(3/14) Installing readline (8.2.10-r0)
+(4/14) Installing bash (5.2.26-r0)
+Executing bash-5.2.26-r0.post-install
+(5/14) Installing ca-certificates (20241121-r1)
+(6/14) Installing brotli-libs (1.1.0-r2)
+(7/14) Installing c-ares (1.33.1-r0)
+(8/14) Installing libunistring (1.2-r0)
+(9/14) Installing libidn2 (2.3.7-r0)
+(10/14) Installing nghttp2-libs (1.62.1-r0)
+(11/14) Installing libpsl (0.21.5-r1)
+(12/14) Installing zstd-libs (1.5.6-r0)
+(13/14) Installing libcurl (8.11.1-r0)
+(14/14) Installing curl (8.11.1-r0)
+Executing busybox-1.36.1-r29.trigger
+Executing ca-certificates-20241121-r1.trigger
+OK: 20 MiB in 32 packages
+Removing intermediate container d971c1513da4
+ ---> 7fd8d6d63263
+Step 6/7 : COPY index.html /usr/share/nginx/html
+ ---> fbfa74594fdc
+Step 7/7 : HEALTHCHECK --interval=60s --timeout=60s --start-period=60s  --retries=3 CMD curl -f http://localhost:8090 || exit 1
+ ---> Running in 079f36200328
+Removing intermediate container 079f36200328
+ ---> f2d02810667b
+Successfully built f2d02810667b
+Successfully tagged kunal3237/imagewithhealthcheck:latest
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# dc
+
+
+#######################################################################################
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker run -d --name myapp -p 8081:80 kunal3237/imagewithhealthcheck
+e2655dd935bbc0f39b1355936bbd3f760c14abe59c572b3af10819f3d44e17da
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker ps
+CONTAINER ID   IMAGE                            COMMAND                  CREATED         STATUS                            PORTS                                   NAMES
+e2655dd935bb   kunal3237/imagewithhealthcheck   "/docker-entrypoint.…"   8 seconds ago   Up 3 seconds (health: starting)   0.0.0.0:8081->80/tcp, :::8081->80/tcp   myapp
+0fc484d9bd09   kindest/node:v1.28.0             "/usr/local/bin/entr…"   5 weeks ago     Up About an hour                                                          kind-worker3
+14d475883ba7   kindest/node:v1.28.0             "/usr/local/bin/entr…"   5 weeks ago     Up About an hour                                                          kind-worker2
+b0ede2a1a2bb   kindest/node:v1.28.0             "/usr/local/bin/entr…"   5 weeks ago     Up About an hour                  127.0.0.1:36811->6443/tcp               kind-control-plane
+80829f8b2dec   kindest/node:v1.28.0             "/usr/local/bin/entr…"   5 weeks ago     Up About an hour                                                          kind-worker
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker exec -it e2655dd935bb bash
+e2655dd935bb:/# ps -a
+PID   USER     TIME  COMMAND
+    1 root      0:00 nginx: master process nginx -g daemon off;
+   30 nginx     0:00 nginx: worker process
+   31 nginx     0:00 nginx: worker process
+   32 nginx     0:00 nginx: worker process
+   33 nginx     0:00 nginx: worker process
+   34 root      0:00 bash
+   40 root      0:00 ps -a
+
+Active Internet connections (servers and established)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
+tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN      1/nginx: master pro
+tcp        0      0 :::80                   :::*                    LISTEN      1/nginx: master pro
+e2655dd935bb:/# ps -a
+PID   USER     TIME  COMMAND
+    1 root      0:00 nginx: master process nginx -g daemon off;
+   30 nginx     0:00 nginx: worker process
+   31 nginx     0:00 nginx: worker process
+   32 nginx     0:00 nginx: worker process
+   33 nginx     0:00 nginx: worker process
+   34 root      0:00 bash
+   42 root      0:00 ps -a
+e2655dd935bb:/# 
+
+##############################Now Status chanaged to unhealthy ###################
+
+root@kunal-Lenovo-U410:/home/kunal# docker ps
+CONTAINER ID   IMAGE                            COMMAND                  CREATED         STATUS                     PORTS                                   NAMES
+e2655dd935bb   kunal3237/imagewithhealthcheck   "/docker-entrypoint.…"   3 minutes ago   Up 3 minutes (unhealthy)   0.0.0.0:8081->80/tcp, :::8081->80/tcp   myapp
+0fc484d9bd09   kindest/node:v1.28.0             "/usr/local/bin/entr…"   5 weeks ago     Up About an hour                                                   kind-worker3
+14d475883ba7   kindest/node:v1.28.0             "/usr/local/bin/entr…"   5 weeks ago     Up About an hour                                                   kind-worker2
+b0ede2a1a2bb   kindest/node:v1.28.0             "/usr/local/bin/entr…"   5 weeks ago     Up About an hour           127.0.0.1:36811->6443/tcp               kind-control-plane
+80829f8b2dec   kindest/node:v1.28.0             "/usr/local/bin/entr…"   5 weeks ago     Up About an hour                                                   kind-worker
+
+root@kunal-Lenovo-U410:/home/kunal# docker inspect e2655dd935bb --format='{{json .State.Health.Status }}' | jq
+"unhealthy"
 
