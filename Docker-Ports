@@ -102,4 +102,83 @@ root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# curl http://localhos
 </body>
 </html>
 root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+######################################Using -P ###########################
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# cat Dockerfile
+FROM nginx:alpine-slim
+
+LABEL Author : Kunal Sharma
+
+ARG file_name='nginx.conf'
+
+COPY ${file_name} /etc/nginx/
+
+RUN apk add bash
+
+EXPOSE 8090
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker run --name myapp -P -d kunal3237/imagewithp
+5e4cf0bf37f3b002ddba1437e2c8072823763e9c586da09a742e6f515ecfd7de
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker ps
+CONTAINER ID   IMAGE                  COMMAND                  CREATED          STATUS         PORTS                                                                                  NAMES
+5e4cf0bf37f3   kunal3237/imagewithp   "/docker-entrypoint.…"   12 seconds ago   Up 7 seconds   0.0.0.0:49156->80/tcp, :::49156->80/tcp, 0.0.0.0:49155->8090/tcp, :::49155->8090/tcp   myapp        ####8090 and 80 are exposed
+0fc484d9bd09   kindest/node:v1.28.0   "/usr/local/bin/entr…"   5 weeks ago      Up 4 hours                                                                                            kind-worker3
+14d475883ba7   kindest/node:v1.28.0   "/usr/local/bin/entr…"   5 weeks ago      Up 4 hours                                                                                            kind-worker2
+b0ede2a1a2bb   kindest/node:v1.28.0   "/usr/local/bin/entr…"   5 weeks ago      Up 4 hours     127.0.0.1:36811->6443/tcp                                                              kind-control-plane
+80829f8b2dec   kindest/node:v1.28.0   "/usr/local/bin/entr…"   5 weeks ago      Up 4 hours                                                                                            kind-worker
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# cat Dockerfile
+
+
+#############nginx.conf mentioning port 8090 ###############
+server {
+    listen 8090;
+    root /usr/share/nginx/html;
+    index index.html;
+    }
+
+##########################################
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker exec -it myapp bash
+5e4cf0bf37f3:/# ps
+PID   USER     TIME  COMMAND
+    1 root      0:00 nginx: master process nginx -g daemon off;
+   31 nginx     0:00 nginx: worker process
+   32 nginx     0:00 nginx: worker process
+   33 nginx     0:00 nginx: worker process
+   34 nginx     0:00 nginx: worker process
+   35 root      0:00 bash
+   41 root      0:00 ps
+5e4cf0bf37f3:/# netstat -ptlan
+Active Internet connections (servers and established)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
+tcp        0      0 0.0.0.0:8090            0.0.0.0:*               LISTEN      1/nginx: master pro                              ####port 80 and 8090 are opem in caontainer, -P expose both then
+tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN      1/nginx: master pro
+tcp        0      0 :::80                   :::*                    LISTEN      1/nginx: master pro
+5e4cf0bf37f3:/# 
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker inspect myapp --format='{{json .NetworkSettings.Ports}}' | jq
+{
+  "80/tcp": [
+    {
+      "HostIp": "0.0.0.0",
+      "HostPort": "49156"
+    },
+    {
+      "HostIp": "::",
+      "HostPort": "49156"
+    }
+  ],
+  "8090/tcp": [
+    {
+      "HostIp": "0.0.0.0",
+      "HostPort": "49155"
+    },
+    {
+      "HostIp": "::",                                                                                                        #####IPV6
+      "HostPort": "49155"
+    }
+  ]
+}
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
 
