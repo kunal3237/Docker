@@ -1,0 +1,105 @@
+####################################################
+Difference between -p and -P flags when running Docker containers.
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# cat Dockerfile
+#FROM python:3.14.0a4-alpine3.21
+FROM nginx:alpine-slim
+
+LABEL Author : Kunal Sharma
+LABEL Created : 21 Jan,2025
+LABEL Description : To Check HealthCheck working
+
+#RUN adduser -D -H -s /bin/bash -u 1001 kunal
+
+RUN apk add bash curl
+#COPY requirement.txt requirement.txt
+#RUN pip3 install -r requirement.txt
+WORKDIR /app
+#USER kunal
+COPY index.html /usr/share/nginx/html
+COPY api-json-data.py /app/api-json-data.py
+#HEALTHCHECK --interval=60s --timeout=60s --start-period=60s  --retries=3 CMD curl -f http://localhost:8090 || exit 1
+
+#ENTRYPOINT ["python3","api-json-data.py"]
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker run -d -p 8081:80 --name myapp kunal3237/imagewithport                        #####port defined here. Host port 8081
+29673ff886314cd91d5932f6075fb1a5e1f0a8d1ff924192416fd1e343cb8283
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker ps
+CONTAINER ID   IMAGE                     COMMAND                  CREATED         STATUS         PORTS                                   NAMES
+29673ff88631   kunal3237/imagewithport   "/docker-entrypoint.…"   7 seconds ago   Up 2 seconds   0.0.0.0:8081->80/tcp, :::8081->80/tcp   myapp                            #####Port defined with -p
+0fc484d9bd09   kindest/node:v1.28.0      "/usr/local/bin/entr…"   5 weeks ago     Up 3 hours                                             kind-worker3
+14d475883ba7   kindest/node:v1.28.0      "/usr/local/bin/entr…"   5 weeks ago     Up 3 hours                                             kind-worker2
+b0ede2a1a2bb   kindest/node:v1.28.0      "/usr/local/bin/entr…"   5 weeks ago     Up 3 hours     127.0.0.1:36811->6443/tcp               kind-control-plane
+80829f8b2dec   kindest/node:v1.28.0      "/usr/local/bin/entr…"   5 weeks ago     Up 3 hours                                             kind-worker
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# curl http://localhost:8081                                        #####Accessible as well
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StackSimplify</title>
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      text-align: center; 
+      padding: 50px; 
+      background-color: rgb(197, 144, 144);
+    }
+    h1 { font-size: 50px; }
+    h2 { font-size: 40px; }
+    h3 { font-size: 30px; }
+    p { font-size: 20px; }
+  </style>
+</head>
+<body>
+  <h1>Welcome to Learn Docker</h1>
+  <h2>Docker Image BUILD, RUN, TAG and PUSH to Docker Hubi,1</h2>
+  <p>Learn technology through practical, real-world demos.</p>
+  <p>Application Version: v1</p>
+</body>
+</html>
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+#####################################Using -p without defining the host port option #####################
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker run -d -p 80 --name myapp kunal3237/imagewithport
+3b7786163e73f17f9d7f0c992b52784244294c6bdd331e0d273fdd3b58c89390
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker ps
+CONTAINER ID   IMAGE                     COMMAND                  CREATED          STATUS         PORTS                                     NAMES
+3b7786163e73   kunal3237/imagewithport   "/docker-entrypoint.…"   10 seconds ago   Up 3 seconds   0.0.0.0:49154->80/tcp, :::49154->80/tcp   myapp                                ####49154 host port assigned
+0fc484d9bd09   kindest/node:v1.28.0      "/usr/local/bin/entr…"   5 weeks ago      Up 3 hours                                               kind-worker3
+14d475883ba7   kindest/node:v1.28.0      "/usr/local/bin/entr…"   5 weeks ago      Up 3 hours                                               kind-worker2
+b0ede2a1a2bb   kindest/node:v1.28.0      "/usr/local/bin/entr…"   5 weeks ago      Up 3 hours     127.0.0.1:36811->6443/tcp                 kind-control-plane
+80829f8b2dec   kindest/node:v1.28.0      "/usr/local/bin/entr…"   5 weeks ago      Up 3 hours                                               kind-worker
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# curl http://localhost:49154                    Accessible over  49154
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StackSimplify</title>
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      text-align: center; 
+      padding: 50px; 
+      background-color: rgb(197, 144, 144);
+    }
+    h1 { font-size: 50px; }
+    h2 { font-size: 40px; }
+    h3 { font-size: 30px; }
+    p { font-size: 20px; }
+  </style>
+</head>
+<body>
+  <h1>Welcome to Learn Docker</h1>
+  <h2>Docker Image BUILD, RUN, TAG and PUSH to Docker Hubi,1</h2>
+  <p>Learn technology through practical, real-world demos.</p>
+  <p>Application Version: v1</p>
+</body>
+</html>
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
