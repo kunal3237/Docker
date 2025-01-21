@@ -163,3 +163,106 @@ root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker volume rm 1a5
 Error response from daemon: remove 1a51a916130d95e834b8beedfd5258e914633176d5323dd1c2ac303f3b5a8ca9: volume is in use - [0fc484d9bd09b837bd69b0c4fa63fd555d3bc6ee52ce2f3287583c837cee1cc4]
 root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
 
+##############################Using the volume, With Mount option #####################
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker volume create my-vol
+my-vol
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker volume ls
+DRIVER    VOLUME NAME
+local     1a51a916130d95e834b8beedfd5258e914633176d5323dd1c2ac303f3b5a8ca9
+local     7476f461feb1b683daba673afaf2d8dde2519db8c1f1bc572ee1e31d90980aa7
+local     cdb78a5e4ce6ab443781652753d83b339010b71f43ac30086a720268052a3a3d
+local     fa361a1f7f7d4ce562932b65c7e20ef22a47a8a505c87573fc74695a5ed86d00
+local     my-vol
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+###########################################################################################
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker run -d -P --mount type=volume,source=my-vol,target=/app --name myapp kunal3237/imagewithvolume
+9b43b1e650368fd67f99d0ca1928c39e0f59ac18d720b049e6a15a018a81220c
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker ps
+CONTAINER ID   IMAGE                       COMMAND                  CREATED         STATUS         PORTS                                                                                  NAMES
+9b43b1e65036   kunal3237/imagewithvolume   "/docker-entrypoint.…"   6 seconds ago   Up 2 seconds   0.0.0.0:49158->80/tcp, :::49158->80/tcp, 0.0.0.0:49157->8090/tcp, :::49157->8090/tcp   myapp
+0fc484d9bd09   kindest/node:v1.28.0        "/usr/local/bin/entr…"   5 weeks ago     Up 5 hours                                                                                            kind-worker3
+14d475883ba7   kindest/node:v1.28.0        "/usr/local/bin/entr…"   5 weeks ago     Up 5 hours                                                                                            kind-worker2
+b0ede2a1a2bb   kindest/node:v1.28.0        "/usr/local/bin/entr…"   5 weeks ago     Up 5 hours     127.0.0.1:36811->6443/tcp                                                              kind-control-plane
+80829f8b2dec   kindest/node:v1.28.0        "/usr/local/bin/entr…"   5 weeks ago     Up 5 hours                                                                                            kind-worker
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker inspect 9b43b1e65036 --format='{{json .Mounts }}' | jq
+[
+  {
+    "Type": "volume",
+    "Name": "my-vol",
+    "Source": "/var/lib/docker/volumes/my-vol/_data",
+    "Destination": "/app",
+    "Driver": "local",
+    "Mode": "z",
+    "RW": true,
+    "Propagation": ""
+  }
+]
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+
+###############################Removing the comtainer after createing a file ##########################
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker exec -it myapp bash 
+9b43b1e65036:/# cd /app
+9b43b1e65036:/app# ls -ltr
+total 0
+9b43b1e65036:/app# cat >kunal.txt
+hio there
+^C
+9b43b1e65036:/app# cat kunal.txt 
+hio there
+9b43b1e65036:/app# exit
+exit
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker stop myapp
+myapp
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker rm myapp
+myapp
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker ps
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker volume inspect my-vol 
+[
+    {
+        "CreatedAt": "2025-01-21T14:51:59+05:30",
+        "Driver": "local",
+        "Labels": {},
+        "Mountpoint": "/var/lib/docker/volumes/my-vol/_data",
+        "Name": "my-vol",
+        "Options": {},
+        "Scope": "local"
+    }
+]
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# cd /var/lib/docker/volumes/my-vol/_data
+root@kunal-Lenovo-U410:/var/lib/docker/volumes/my-vol/_data# ls -ltr
+total 4
+-rw-r--r-- 1 root root 10 Jan 21 14:52 kunal.txt                                                                  #####File exist even after deleting the container
+root@kunal-Lenovo-U410:/var/lib/docker/volumes/my-vol/_data# cat kunal.txt 
+hio there
+root@kunal-Lenovo-U410:/var/lib/docker/volumes/my-vol/_data# 
+
+
+root@kunal-Lenovo-U410:/var/lib/docker/volumes/my-vol/_data# docker volume ls
+DRIVER    VOLUME NAME
+local     1a51a916130d95e834b8beedfd5258e914633176d5323dd1c2ac303f3b5a8ca9
+local     7476f461feb1b683daba673afaf2d8dde2519db8c1f1bc572ee1e31d90980aa7
+local     cdb78a5e4ce6ab443781652753d83b339010b71f43ac30086a720268052a3a3d
+local     fa361a1f7f7d4ce562932b65c7e20ef22a47a8a505c87573fc74695a5ed86d00
+local     my-vol
+root@kunal-Lenovo-U410:/var/lib/docker/volumes/my-vol/_data# docker volume prune
+WARNING! This will remove all local volumes not used by at least one container.
+Are you sure you want to continue? [y/N] y
+Deleted Volumes:
+my-vol
+
+Total reclaimed space: 10B
+root@kunal-Lenovo-U410:/var/lib/docker/volumes/my-vol/_data# docker volume ls
+DRIVER    VOLUME NAME
+local     1a51a916130d95e834b8beedfd5258e914633176d5323dd1c2ac303f3b5a8ca9
+local     7476f461feb1b683daba673afaf2d8dde2519db8c1f1bc572ee1e31d90980aa7
+local     cdb78a5e4ce6ab443781652753d83b339010b71f43ac30086a720268052a3a3d
+local     fa361a1f7f7d4ce562932b65c7e20ef22a47a8a505c87573fc74695a5ed86d00
+root@kunal-Lenovo-U410:/var/lib/docker/volumes/my-vol/_data# 
+
