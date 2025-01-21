@@ -266,3 +266,101 @@ local     cdb78a5e4ce6ab443781652753d83b339010b71f43ac30086a720268052a3a3d
 local     fa361a1f7f7d4ce562932b65c7e20ef22a47a8a505c87573fc74695a5ed86d00
 root@kunal-Lenovo-U410:/var/lib/docker/volumes/my-vol/_data# 
 
+
+#########################################################################
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# cat Dockerfile
+FROM nginx:alpine-slim
+
+LABEL Author : Kunal Sharma
+
+ARG file_name='nginx.conf'
+
+COPY ${file_name} /etc/nginx/
+
+WORKDIR /app
+RUN apk add bash
+COPY index.html .
+EXPOSE 8090
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker build -t imagewithvolume .
+Sending build context to Docker daemon  22.53kB
+Step 1/8 : FROM nginx:alpine-slim
+ ---> 9765c8de364c
+Step 2/8 : LABEL Author : Kunal Sharma
+ ---> Using cache
+ ---> e43f31f1359d
+Step 3/8 : ARG file_name='nginx.conf'
+ ---> Using cache
+ ---> d04489bc606f
+Step 4/8 : COPY ${file_name} /etc/nginx/
+ ---> Using cache
+ ---> 9e3523739c75
+Step 5/8 : WORKDIR /app
+ ---> Running in b01dab269497
+Removing intermediate container b01dab269497
+ ---> e4b932b42c56
+Step 6/8 : RUN apk add bash
+ ---> Running in da7885c4cd11
+fetch https://dl-cdn.alpinelinux.org/alpine/v3.20/main/x86_64/APKINDEX.tar.gz
+fetch https://dl-cdn.alpinelinux.org/alpine/v3.20/community/x86_64/APKINDEX.tar.gz
+(1/4) Installing ncurses-terminfo-base (6.4_p20240420-r2)
+(2/4) Installing libncursesw (6.4_p20240420-r2)
+(3/4) Installing readline (8.2.10-r0)
+(4/4) Installing bash (5.2.26-r0)
+Executing bash-5.2.26-r0.post-install
+Executing busybox-1.36.1-r29.trigger
+OK: 15 MiB in 22 packages
+Removing intermediate container da7885c4cd11
+ ---> 4c631cdb05e8
+Step 7/8 : COPY index.html .
+ ---> a06a27d6c087
+Step 8/8 : EXPOSE 8090
+ ---> Running in a926013a9699
+Removing intermediate container a926013a9699
+ ---> 73f8c0b5342f
+Successfully built 73f8c0b5342f
+Successfully tagged imagewithvolume:latest
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker run -d -P --mount type=volume,source=my-vol,target=/app --name myapp imagewithvolume
+a661f360de54e21e3b222ea588a550d7355985626561555728939252de1ecc74
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker ps
+CONTAINER ID   IMAGE                  COMMAND                  CREATED         STATUS         PORTS                                                                                  NAMES
+a661f360de54   imagewithvolume        "/docker-entrypoint.…"   8 seconds ago   Up 3 seconds   0.0.0.0:49160->80/tcp, :::49160->80/tcp, 0.0.0.0:49159->8090/tcp, :::49159->8090/tcp   myapp
+0fc484d9bd09   kindest/node:v1.28.0   "/usr/local/bin/entr…"   5 weeks ago     Up 6 hours                                                                                            kind-worker3
+14d475883ba7   kindest/node:v1.28.0   "/usr/local/bin/entr…"   5 weeks ago     Up 6 hours                                                                                            kind-worker2
+b0ede2a1a2bb   kindest/node:v1.28.0   "/usr/local/bin/entr…"   5 weeks ago     Up 6 hours     127.0.0.1:36811->6443/tcp                                                              kind-control-plane
+80829f8b2dec   kindest/node:v1.28.0   "/usr/local/bin/entr…"   5 weeks ago     Up 6 hours                                                                                            kind-worker
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker exec -it myapp bash
+a661f360de54:/app# ls -ltr
+total 4
+-rw-r--r--    1 root     root           679 Jan 20 05:25 index.html
+a661f360de54:/app# 
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker volume ls
+DRIVER    VOLUME NAME
+local     1a51a916130d95e834b8beedfd5258e914633176d5323dd1c2ac303f3b5a8ca9
+local     7476f461feb1b683daba673afaf2d8dde2519db8c1f1bc572ee1e31d90980aa7
+local     cdb78a5e4ce6ab443781652753d83b339010b71f43ac30086a720268052a3a3d
+local     fa361a1f7f7d4ce562932b65c7e20ef22a47a8a505c87573fc74695a5ed86d00
+local     my-vol
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker volume inspect my-vol
+[
+    {
+        "CreatedAt": "2025-01-21T15:41:55+05:30",
+        "Driver": "local",
+        "Labels": null,
+        "Mountpoint": "/var/lib/docker/volumes/my-vol/_data",
+        "Name": "my-vol",
+        "Options": null,
+        "Scope": "local"
+    }
+]
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+###########################
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# cd /var/lib/docker/volumes/my-vol/_data
+root@kunal-Lenovo-U410:/var/lib/docker/volumes/my-vol/_data# ls -ltr
+total 4
+-rw-r--r-- 1 root root 679 Jan 20 10:55 index.html                                                                  #####File existseven after deleting the container
+root@kunal-Lenovo-U410:/var/lib/docker/volumes/my-vol/_data# 
+
+
