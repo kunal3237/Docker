@@ -1,0 +1,335 @@
+###############################################
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker volume ls
+DRIVER    VOLUME NAME
+local     1a51a916130d95e834b8beedfd5258e914633176d5323dd1c2ac303f3b5a8ca9
+local     7476f461feb1b683daba673afaf2d8dde2519db8c1f1bc572ee1e31d90980aa7
+local     cdb78a5e4ce6ab443781652753d83b339010b71f43ac30086a720268052a3a3d
+local     fa361a1f7f7d4ce562932b65c7e20ef22a47a8a505c87573fc74695a5ed86d00
+local     my-vol
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker run -d -P --name myapp --mount type=volume,source=my-vol,target=/usr/share/nginx/app2,readonly imagewithvolume
+d02a5e458881dac7f864aae2de159631d18d284824c06aac1829a9421d8bae2b
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker ps
+CONTAINER ID   IMAGE                  COMMAND                  CREATED          STATUS         PORTS                                                                                  NAMES
+d02a5e458881   imagewithvolume        "/docker-entrypoint.…"   11 seconds ago   Up 6 seconds   0.0.0.0:49164->80/tcp, :::49164->80/tcp, 0.0.0.0:49163->8090/tcp, :::49163->8090/tcp   myapp
+0fc484d9bd09   kindest/node:v1.28.0   "/usr/local/bin/entr…"   5 weeks ago      Up 8 hours                                                                                            kind-worker3
+14d475883ba7   kindest/node:v1.28.0   "/usr/local/bin/entr…"   5 weeks ago      Up 8 hours                                                                                            kind-worker2
+b0ede2a1a2bb   kindest/node:v1.28.0   "/usr/local/bin/entr…"   5 weeks ago      Up 8 hours     127.0.0.1:36811->6443/tcp                                                              kind-control-plane
+80829f8b2dec   kindest/node:v1.28.0   "/usr/local/bin/entr…"   5 weeks ago      Up 8 hours                                                                                            kind-worker
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker inspect myapp --format='{{json .Mounts}}' | jq
+[
+  {
+    "Type": "volume",
+    "Name": "my-vol",
+    "Source": "/var/lib/docker/volumes/my-vol/_data",
+    "Destination": "/usr/share/nginx/app2",
+    "Driver": "local",
+    "Mode": "z",
+    "RW": false,                                                                                      #####RW is FALSE
+    "Propagation": ""
+  }
+]
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker exec -it myapp bash
+d02a5e458881:/app# ls -ltr
+total 4
+-rw-r--r--    1 root     root           679 Jan 20 05:25 index.html
+d02a5e458881:/app# cd /usr/share/nginx
+d02a5e458881:/usr/share/nginx# ls -ltr
+total 8
+drwxr-xr-x    2 root     root          4096 Jan  8 17:59 html
+drwxr-xr-x    3 root     root          4096 Jan 21 11:53 app2
+d02a5e458881:/usr/share/nginx# cd app2/
+d02a5e458881:/usr/share/nginx/app2# ls -ltr
+total 8
+-rw-r--r--    1 root     root           679 Jan 20 05:25 index.html
+drwxr-xr-x    2 root     root          4096 Jan 21 11:53 app1
+d02a5e458881:/usr/share/nginx/app2# touch kk
+touch: kk: Read-only file system                                                                                  ####Read Only
+d02a5e458881:/usr/share/nginx/app2# 
+
+####################################Bind Mounts###################################
+We can directly use HOST directory as a volume in the docker using Bind mounts
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker run -d -P --mount type=bind,source=/home/kunal/Docker-Study/myPractice/mybindvolume,target=/app1 --name myapp  imagewithvolume
+749b0ebd06983c85f2d6909c713e5dc13a8bd81e0de1a8a79ee31d882aa04da3
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker volume ls
+DRIVER    VOLUME NAME
+local     1a51a916130d95e834b8beedfd5258e914633176d5323dd1c2ac303f3b5a8ca9
+local     7476f461feb1b683daba673afaf2d8dde2519db8c1f1bc572ee1e31d90980aa7
+local     cdb78a5e4ce6ab443781652753d83b339010b71f43ac30086a720268052a3a3d
+local     fa361a1f7f7d4ce562932b65c7e20ef22a47a8a505c87573fc74695a5ed86d00
+local     my-vol
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker exec -it myapp bash
+749b0ebd0698:/app# ls -ltr
+total 4
+-rw-r--r--    1 root     root           679 Jan 20 05:25 index.html
+749b0ebd0698:/app# cd /app1
+749b0ebd0698:/app1# ls -lrt
+total 4
+-rw-r--r--    1 root     root            25 Jan 21 12:12 test.txt
+749b0ebd0698:/app1# cat test.txt 
+Testing with bind volume
+749b0ebd0698:/app1# vi test1.txt
+749b0ebd0698:/app1# cat test1.txt 
+creating file from container to check the bind volume
+749b0ebd0698:/app1# exit
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker stop myapp;docker rm myapp
+myapp
+myapp
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# ls -ltr mybindvolume/test
+test1.txt  test.txt   
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# ls -ltr mybindvolume/test
+test1.txt  test.txt   
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# cat mybindvolume/test1.txt                                           ####File exists after deleting the container
+creating file from container to check the bind volume
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+#################################Mount Bind with read-Only#######################################
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker run -d -P --mount type=bind,source=/home/kunal/Docker-Study/myPractice/mybindvolume,target=/app1,readonly --name myapp  imagewithvolume
+2f488a07aa5286bf85331a96732b3d61f7cbd6c1db612e4acbef2826f1882aaa
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker exec -it myapp bash
+2f488a07aa52:/app# cd /app1
+2f488a07aa52:/app1# ls -ltr
+total 8
+-rw-r--r--    1 root     root            25 Jan 21 12:12 test.txt
+-rw-r--r--    1 root     root            54 Jan 21 12:17 test1.txt
+2f488a07aa52:/app1# touch test2.txt
+touch: test2.txt: Read-only file system                                                                                                          #####Readonly
+2f488a07aa52:/app1# exit
+exit
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+###################################Test case for volume and Bind mount #################################
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker volume inspect my-vol
+[
+    {
+        "CreatedAt": "2025-01-21T17:23:12+05:30",
+        "Driver": "local",
+        "Labels": null,
+        "Mountpoint": "/var/lib/docker/volumes/my-vol/_data",
+        "Name": "my-vol",
+        "Options": null,
+        "Scope": "local"
+    }
+]
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# ls -ltr /var/lib/docker/volumes/my-vol/_data
+total 8
+-rw-r--r-- 1 root root  679 Jan 20 10:55 index.html
+drwxr-xr-x 2 root root 4096 Jan 21 17:23 app1
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# ls -ltr /var/lib/docker/volumes/my-vol/_data/app1
+total 4
+-rw-r--r-- 1 root root 51 Jan 21 17:23 kk.txt
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker run -d -P --mount type=volume,source=my-vol,target=/app1 --name myapp  imagewithvolume
+d4ef2b69205ce2100d650c07d2cb1151d8b414342e1c8936befb7788af0bbb56
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker ps
+CONTAINER ID   IMAGE                  COMMAND                  CREATED          STATUS         PORTS                                                                                  NAMES
+d4ef2b69205c   imagewithvolume        "/docker-entrypoint.…"   12 seconds ago   Up 6 seconds   0.0.0.0:49170->80/tcp, :::49170->80/tcp, 0.0.0.0:49169->8090/tcp, :::49169->8090/tcp   myapp
+0fc484d9bd09   kindest/node:v1.28.0   "/usr/local/bin/entr…"   5 weeks ago      Up 8 hours                                                                                            kind-worker3
+14d475883ba7   kindest/node:v1.28.0   "/usr/local/bin/entr…"   5 weeks ago      Up 8 hours                                                                                            kind-worker2
+b0ede2a1a2bb   kindest/node:v1.28.0   "/usr/local/bin/entr…"   5 weeks ago      Up 8 hours     127.0.0.1:36811->6443/tcp                                                              kind-control-plane
+80829f8b2dec   kindest/node:v1.28.0   "/usr/local/bin/entr…"   5 weeks ago      Up 8 hours                                                                                            kind-worker
+
+
+######################Pretty Format #############################################
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker ps --format "table {{.Image}}\t{{.Names}}\t{{.Status}}\t{{.ID}}\t{{.Ports}}"
+IMAGE                  NAMES                STATUS              CONTAINER ID   PORTS
+imagewithvolume        myapp                Up About a minute   d4ef2b69205c   0.0.0.0:49170->80/tcp, :::49170->80/tcp, 0.0.0.0:49169->8090/tcp, :::49169->8090/tcp
+kindest/node:v1.28.0   kind-worker3         Up 8 hours          0fc484d9bd09   
+kindest/node:v1.28.0   kind-worker2         Up 8 hours          14d475883ba7   
+kindest/node:v1.28.0   kind-control-plane   Up 8 hours          b0ede2a1a2bb   127.0.0.1:36811->6443/tcp
+kindest/node:v1.28.0   kind-worker          Up 8 hours          80829f8b2dec   
+
+
+#######################All data available ###############################
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker exec -it myapp bash
+d4ef2b69205c:/app# cd /app1
+d4ef2b69205c:/app1# ls -ltr
+total 8
+-rw-r--r--    1 root     root           679 Jan 20 05:25 index.html
+drwxr-xr-x    2 root     root          4096 Jan 21 11:53 app1
+d4ef2b69205c:/app1# 
+
+########################################BInding a directory #################################
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker run -d -P --mount type=bind,source=${PWD}/mybindvolume,target=/app1 --name myapp  imagewithvolume
+ff23a7b7dbeb681bc2c6b1e6107e2bc69a865e898bac04e29218fd7c38141239
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker ps --format "table {{.Image}}\t{{.Names}}\t{{.Status}}\t{{.ID}}\t{{.Ports}}"
+IMAGE                  NAMES                STATUS         CONTAINER ID   PORTS
+imagewithvolume        myapp                Up 3 seconds   ff23a7b7dbeb   0.0.0.0:49172->80/tcp, :::49172->80/tcp, 0.0.0.0:49171->8090/tcp, :::49171->8090/tcp
+kindest/node:v1.28.0   kind-worker3         Up 8 hours     0fc484d9bd09   
+kindest/node:v1.28.0   kind-worker2         Up 8 hours     14d475883ba7   
+kindest/node:v1.28.0   kind-control-plane   Up 8 hours     b0ede2a1a2bb   127.0.0.1:36811->6443/tcp
+kindest/node:v1.28.0   kind-worker          Up 8 hours     80829f8b2dec   
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+
+#############################################################################
+<pre>root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker network ls
+NETWORK ID     NAME      DRIVER    SCOPE
+3ca70f008e66   bridge    bridge    local
+ff13d12d7a5c   host      host      local
+b9439560ef50   kind      bridge    local
+59cf7b7616ed   none      null      local
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+</pre>
+
+################################Network inspect ####################
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker network inspect b9439560ef50
+[
+    {
+        "Name": "kind",
+        "Id": "b9439560ef50a53bc87d5123b0555f73da0f0323e90dcc50093bad38f0efa81c",
+        "Created": "2024-12-15T17:04:37.618348781+05:30",
+        "Scope": "local",
+        "Driver": "bridge",
+        "EnableIPv6": true,
+        "IPAM": {
+            "Driver": "default",
+            "Options": {},
+            "Config": [
+                {
+                    "Subnet": "172.18.0.0/16",
+                    "Gateway": "172.18.0.1"
+                },
+                {
+                    "Subnet": "fc00:f853:ccd:e793::/64",
+                    "Gateway": "fc00:f853:ccd:e793::1"
+                }
+            ]
+        },
+        "Internal": false,
+        "Attachable": false,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Containers": {
+            "0fc484d9bd09b837bd69b0c4fa63fd555d3bc6ee52ce2f3287583c837cee1cc4": {
+                "Name": "kind-worker3",
+                "EndpointID": "4399492cc50fc92e441b4d6c63bf61e7bce7e63c1a5668af973708d806cc4947",
+                "MacAddress": "02:42:ac:12:00:05",
+                "IPv4Address": "172.18.0.5/16",
+                "IPv6Address": "fc00:f853:ccd:e793::5/64"
+            },
+            "14d475883ba75fc410d69bc4f41b07a48db949c92ee8c696f2fafac9a2008ad4": {
+                "Name": "kind-worker2",
+                "EndpointID": "cd7b94d558352065604be9bf643f3762b757748d11e0d6743cc2ba3732fc4432",
+                "MacAddress": "02:42:ac:12:00:02",
+                "IPv4Address": "172.18.0.2/16",
+                "IPv6Address": "fc00:f853:ccd:e793::2/64"
+            },
+            "80829f8b2decdebd91cfdb5bf52d28e8765b4f3913086d6189cc7e13d7eaf4b3": {
+                "Name": "kind-worker",
+                "EndpointID": "6cc1717045bc8181876078a76e90b823692401cdde6ba330bdef10844c1c18c3",
+                "MacAddress": "02:42:ac:12:00:04",
+                "IPv4Address": "172.18.0.4/16",
+                "IPv6Address": "fc00:f853:ccd:e793::4/64"
+            },
+            "b0ede2a1a2bb8bb7ea65918a4438456fa4e9484b6d20ffe39d07b436c617726b": {
+                "Name": "kind-control-plane",
+                "EndpointID": "eb066b1de08c6efdd5641909e6b9cd8cc3c7f02639444dae24446d187cd34343",
+                "MacAddress": "02:42:ac:12:00:03",
+                "IPv4Address": "172.18.0.3/16",
+                "IPv6Address": "fc00:f853:ccd:e793::3/64"
+            }
+        },
+        "Options": {
+            "com.docker.network.bridge.enable_ip_masquerade": "true",
+            "com.docker.network.driver.mtu": "1500"
+        },
+        "Labels": {}
+    }
+]
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker system df
+TYPE            TOTAL     ACTIVE    SIZE      RECLAIMABLE
+Images          20        2         8.328GB   7.373GB (88%)
+Containers      5         5         4.714MB   0B (0%)
+Local Volumes   5         4         5.415GB   730B (0%)
+Build Cache     0         0         0B        0B
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+
+###############################tmpfs in docker #############################
+tmpfs mounts are temporary file storage systems that reside in the host system's memory. They are useful for scenarios requiring fast, ephemeral storage that doesn't persist after the container stops.
+
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker run -d -P --mount type=tmpfs,target=/app1 --name myapp  imagewithvolume
+6c1a6475d3388495fd7a328f1a96954413dc58eaef407aa2732126c7ed1999ba
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker ps
+CONTAINER ID   IMAGE                  COMMAND                  CREATED         STATUS         PORTS                                                                                  NAMES
+6c1a6475d338   imagewithvolume        "/docker-entrypoint.…"   7 seconds ago   Up 2 seconds   0.0.0.0:49174->80/tcp, :::49174->80/tcp, 0.0.0.0:49173->8090/tcp, :::49173->8090/tcp   myapp
+0fc484d9bd09   kindest/node:v1.28.0   "/usr/local/bin/entr…"   5 weeks ago     Up 8 hours                                                                                            kind-worker3
+14d475883ba7   kindest/node:v1.28.0   "/usr/local/bin/entr…"   5 weeks ago     Up 8 hours                                                                                            kind-worker2
+b0ede2a1a2bb   kindest/node:v1.28.0   "/usr/local/bin/entr…"   5 weeks ago     Up 8 hours     127.0.0.1:36811->6443/tcp                                                              kind-control-plane
+80829f8b2dec   kindest/node:v1.28.0   "/usr/local/bin/entr…"   5 weeks ago     Up 8 hours                                                                                            kind-worker
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker exec -it myapp bash
+6c1a6475d338:/app# cd /app1
+6c1a6475d338:/app1# ls -tlr
+total 0
+6c1a6475d338:/app1# cat >kk.txt
+how there
+hi there
+^C
+6c1a6475d338:/app1# cat kk.txt 
+how there
+hi there
+6c1a6475d338:/app1# 
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker inspect myapp --format='{{json .Mounts}}' |jq
+[
+  {
+    "Type": "tmpfs",
+    "Source": "",
+    "Destination": "/app1",
+    "Mode": "",
+    "RW": true,
+    "Propagation": ""
+  }
+]
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker run -d -P --mount type=tmpfs,target=/app1 --name myapp  imagewithvolume
+751311ef7d41f50866751ff0d4d9bfc2adbb7cb071ae1befa51949e93824b097
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker exec -it myapp bash
+751311ef7d41:/app# cd /app1
+751311ef7d41:/app1# cat > kk.txt
+hi there
+^C
+751311ef7d41:/app1# cat       kk.txt 
+hi there
+751311ef7d41:/app1# exit
+exit
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker stop myapp
+myapp
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker start myapp
+myapp
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker exec -it myapp bash
+751311ef7d41:/app# cd /app1
+751311ef7d41:/app1# ls -ltr                                                                                        #####File is not available after restart
+total 0
+751311ef7d41:/app1# 
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker run -d -P --mount type=tmpfs,target=/app1,tmpfs-size=10m --name myapp  imagewithvolume
+3fca4eb26486de6dbe6061489e1a4c9136fec1d3de69125facd3798d9e0fa95e
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker inspect myapp --format='{{json .Mounts}}' |jq
+[
+  {
+    "Type": "tmpfs",
+    "Source": "",
+    "Destination": "/app1",
+    "Mode": "",
+    "RW": true,
+    "Propagation": ""
+  }
+]
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
