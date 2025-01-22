@@ -7,6 +7,7 @@ useful for projects with complex build requirements where intermediate files and
 Only the files required for running the application are included in the final image.
 No unnecessary tools, dependencies, or files from the build environment are present in the final image.
 
+scratch is empty, so we need to install the required packages, It will throw error if you try to access package as nothing exists in this image
 
 ######################Listing PIP in existing python image ###########################
 
@@ -26,4 +27,57 @@ PyNaCl             1.5.0
 requests           2.32.3
 urllib3            2.3.0
 root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+#####################################Multi Stage build #######################################
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# cat Dockerfile
+# Stage 1: Builder Environment
+FROM python:3.14-rc-alpine as builder
+
+# Set working directory
+WORKDIR /app
+
+# Install build tools and libraries
+RUN apk add --no-cache gcc g++ musl-dev libffi-dev zlib-dev
+
+# Install Python dependencies
+RUN pip3 install --prefix=/python-root requests paramiko                                            #####Installing the packages in /python-root, It will create bin and lib directories inside same like for site packages
+RUN ls /python-root/lib
+# Copy application code
+COPY api-json-data.py /app/api-json-data.py
+
+# Stage 2: Minimal Scratch Image
+FROM scratch
+
+# Copy Python interpreter and required libraries
+COPY --from=builder /usr/local /usr/local                                                                    #####These directories need to be copied as python is installed here
+COPY --from=builder /lib /lib
+COPY --from=builder /usr/lib /usr/lib
+COPY --from=builder /app /app
+COPY --from=builder /python-root /usr/local                                                              #####Copy to have installed package. Else it will throw erro. Saying requests does not exist
+
+# Copy any missing Python-related shared libraries
+COPY --from=builder /usr/local/lib/python3.14/site-packages /usr/local/lib/python3.14/site-packages
+
+# Set the working directory
+WORKDIR /app
+
+# Set the PATH for Python binaries
+ENV PATH="/usr/local/bin:$PATH"                                                                  ####Setting the python in PATH
+
+# Command to execute the application
+ENTRYPOINT ["python3", "api-json-data.py"]
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+############################################################
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker logs myapp1
+Date : 2025-01-22
+TimeZone: America/New_York
+First Light: 5:50:05 AM
+Last Light: 6:51:45 PM
+Day Length: 9:55:50
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
 
