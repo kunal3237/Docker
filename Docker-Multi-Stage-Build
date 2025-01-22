@@ -119,4 +119,14 @@ Total: 0 (UNKNOWN: 0, LOW: 0, MEDIUM: 0, HIGH: 0, CRITICAL: 0)
 
 root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
 
+################################After multi stage image creation, you will see one extra image, That is basically builder image
 
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker images
+REPOSITORY                      TAG                   IMAGE ID       CREATED         SIZE
+multistage                      latest                3e53bd387cae   2 minutes ago   135MB
+<none>                          <none>                e5b6086aed1d   3 minutes ago   334MB                ####This is build image that we used for final stage
+
+###########################Logs Mention this image ID######################
+Step 6/16 : COPY api-json-data.py /app/api-json-data.py
+ ---> e5b6086aed1d
+#################################################################
