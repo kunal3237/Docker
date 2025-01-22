@@ -80,4 +80,43 @@ Day Length: 9:55:50
 
 root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
 
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker run -d --name myapp multistage
+f1303dcf9626acc815e36ca6658187acebba48060d7068e3e70182d575d0ef24
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# docker ps 
+CONTAINER ID   IMAGE                  COMMAND                  CREATED         STATUS         PORTS                       NAMES
+f1303dcf9626   multistage             "python3 api-json-da…"   8 seconds ago   Up 3 seconds                               myapp
+0fc484d9bd09   kindest/node:v1.28.0   "/usr/local/bin/entr…"   5 weeks ago     Up 2 hours                                 kind-worker3
+14d475883ba7   kindest/node:v1.28.0   "/usr/local/bin/entr…"   5 weeks ago     Up 2 hours                                 kind-worker2
+b0ede2a1a2bb   kindest/node:v1.28.0   "/usr/local/bin/entr…"   5 weeks ago     Up 2 hours     127.0.0.1:36811->6443/tcp   kind-control-plane
+80829f8b2dec   kindest/node:v1.28.0   "/usr/local/bin/entr…"   5 weeks ago     Up 2 hours                                 kind-worker
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
+#############################Checking the Vulnerabilities #######################
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# trivy image multistage
+2025-01-22T18:28:06+05:30	INFO	[vuln] Vulnerability scanning is enabled
+2025-01-22T18:28:06+05:30	INFO	[secret] Secret scanning is enabled
+2025-01-22T18:28:06+05:30	INFO	[secret] If your scanning is slow, please try '--scanners vuln' to disable secret scanning
+2025-01-22T18:28:06+05:30	INFO	[secret] Please see also https://aquasecurity.github.io/trivy/v0.58/docs/scanner/secret#recommendation for faster secret detection
+2025-01-22T18:28:10+05:30	INFO	[python] License acquired from METADATA classifiers may be subject to additional terms	name="bcrypt" version="4.2.1"
+2025-01-22T18:28:10+05:30	INFO	[python] License acquired from METADATA classifiers may be subject to additional terms	name="certifi" version="2024.12.14"
+2025-01-22T18:28:10+05:30	INFO	[python] License acquired from METADATA classifiers may be subject to additional terms	name="cffi" version="1.17.1"
+2025-01-22T18:28:10+05:30	INFO	[python] License acquired from METADATA classifiers may be subject to additional terms	name="charset-normalizer" version="3.4.1"
+2025-01-22T18:28:10+05:30	INFO	[python] License acquired from METADATA classifiers may be subject to additional terms	name="cryptography" version="44.0.0"
+2025-01-22T18:28:10+05:30	INFO	[python] License acquired from METADATA classifiers may be subject to additional terms	name="paramiko" version="3.5.0"
+2025-01-22T18:28:10+05:30	INFO	[python] License acquired from METADATA classifiers may be subject to additional terms	name="pycparser" version="2.22"
+2025-01-22T18:28:10+05:30	INFO	[python] License acquired from METADATA classifiers may be subject to additional terms	name="requests" version="2.32.3"
+2025-01-22T18:28:10+05:30	INFO	[python] License acquired from METADATA classifiers may be subject to additional terms	name="pip" version="24.3.1"
+2025-01-22T18:28:12+05:30	INFO	[python] License acquired from METADATA classifiers may be subject to additional terms	name="pip" version="24.3.1"
+2025-01-22T18:28:12+05:30	INFO	Detected OS	family="alpine" version="3.21.2"
+2025-01-22T18:28:12+05:30	WARN	This OS version is not on the EOL list	family="alpine" version="3.21"
+2025-01-22T18:28:12+05:30	INFO	[alpine] Detecting vulnerabilities...	os_version="3.21" repository="" pkg_num=47
+2025-01-22T18:28:12+05:30	INFO	Number of language-specific files	num=1
+2025-01-22T18:28:12+05:30	INFO	[python-pkg] Detecting vulnerabilities...
+
+multistage (alpine 3.21.2)
+
+Total: 0 (UNKNOWN: 0, LOW: 0, MEDIUM: 0, HIGH: 0, CRITICAL: 0)
+
+root@kunal-Lenovo-U410:/home/kunal/Docker-Study/myPractice# 
+
 
